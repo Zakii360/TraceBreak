@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TraceBreak Search</title>
+  <title>TraceBreak</title>
   <meta name="description" content="Trace the web, not the user.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
 
   <style>
     :root {
-      color-scheme: light;
       font-family: Arial, Helvetica, sans-serif;
-      background: #fff;
       color: #171717;
+      background: #fff;
     }
 
     * {
@@ -26,11 +26,11 @@
     header {
       position: sticky;
       top: 0;
-      z-index: 10;
-      padding: 15px 24px;
+      z-index: 20;
+      padding: 14px 24px;
       border-bottom: 1px solid #e7e7e7;
-      background: #fffffff2;
-      backdrop-filter: blur(9px);
+      background: rgba(255, 255, 255, .94);
+      backdrop-filter: blur(10px);
     }
 
     .top {
@@ -51,32 +51,33 @@
     }
 
     .search {
+      width: min(760px, 100%);
       display: flex;
-      width: min(720px, 100%);
       gap: 8px;
     }
 
     .search input {
-      flex: 1;
-      min-width: 0;
+      width: 100%;
       height: 42px;
       padding: 0 14px;
       border: 1px solid #cfcfcf;
-      border-radius: 6px;
-      outline: none;
+      border-radius: 7px;
+      outline: 0;
+      background: #fff;
+      color: #171717;
       font-size: 15px;
     }
 
     .search input:focus {
       border-color: #777;
-      box-shadow: 0 0 0 3px #0000000c;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, .05);
     }
 
     .search button {
       height: 42px;
       padding: 0 18px;
       border: 0;
-      border-radius: 6px;
+      border-radius: 7px;
       background: #171717;
       color: #fff;
       cursor: pointer;
@@ -88,7 +89,7 @@
 
     .layout {
       width: min(1120px, calc(100% - 48px));
-      margin: 30px auto 80px;
+      margin: 30px auto 90px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) 310px;
       gap: 55px;
@@ -114,15 +115,15 @@
       width: 20px;
       height: 20px;
       margin-top: 2px;
+      flex: 0 0 20px;
       border-radius: 4px;
       object-fit: contain;
-      flex: 0 0 20px;
     }
 
     .result-title {
       color: #174ea6;
       font-size: 19px;
-      line-height: 1.25;
+      line-height: 1.3;
       text-decoration: none;
     }
 
@@ -142,9 +143,9 @@
     .description {
       max-width: 760px;
       margin: 0 0 0 30px;
-      color: #4c4c4c;
+      color: #4b4b4b;
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.55;
     }
 
     .empty {
@@ -165,18 +166,19 @@
     }
 
     .knowledge-label {
-      margin-bottom: 16px;
+      margin-bottom: 15px;
       color: #777;
-      font-size: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .1em;
       text-transform: uppercase;
-      letter-spacing: .08em;
     }
 
     .knowledge-title {
       margin: 0;
       font-size: 24px;
       line-height: 1.2;
-      letter-spacing: -.5px;
+      letter-spacing: -.6px;
     }
 
     .knowledge-source {
@@ -189,7 +191,7 @@
       display: block;
       width: 100%;
       max-height: 190px;
-      margin-bottom: 16px;
+      margin-bottom: 15px;
       border-radius: 7px;
       object-fit: cover;
     }
@@ -203,7 +205,7 @@
 
     .knowledge-link {
       display: inline-block;
-      margin-top: 14px;
+      margin-top: 13px;
       color: #174ea6;
       font-size: 13px;
       text-decoration: none;
@@ -214,14 +216,14 @@
     }
 
     .knowledge-block {
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 1px solid #e8e8e8;
+      margin-top: 23px;
+      padding-top: 19px;
+      border-top: 1px solid #e7e7e7;
     }
 
-    .knowledge-block-title {
+    .knowledge-block h3 {
       margin: 0 0 8px;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     .knowledge-block p {
@@ -229,6 +231,40 @@
       color: #555;
       font-size: 13px;
       line-height: 1.5;
+    }
+
+    .instant {
+      display: none;
+      margin-bottom: 30px;
+      padding: 18px;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .instant.visible {
+      display: block;
+    }
+
+    .instant-label {
+      margin-bottom: 8px;
+      color: #777;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .instant-value {
+      font-size: 27px;
+      font-weight: 600;
+      letter-spacing: -.6px;
+    }
+
+    .instant-sub {
+      margin-top: 5px;
+      color: #666;
+      font-size: 13px;
     }
 
     @media (max-width: 850px) {
@@ -250,7 +286,7 @@
       }
 
       .top {
-        gap: 13px;
+        gap: 14px;
       }
 
       .brand {
@@ -294,6 +330,12 @@
 
   <main class="layout">
     <section>
+      <div class="instant" id="instant">
+        <div class="instant-label" id="instant-label"></div>
+        <div class="instant-value" id="instant-value"></div>
+        <div class="instant-sub" id="instant-sub"></div>
+      </div>
+
       <div class="meta" id="meta">Searching...</div>
       <div id="results"></div>
     </section>
@@ -308,25 +350,40 @@
     const SUPABASE_SEARCH =
       "https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/tracebreak-search-v2";
 
-    const WIKIPEDIA_API =
-      "https://en.wikipedia.org/api/rest_v1/page/summary/";
-
-    const DDG_API =
-      "https://api.duckduckgo.com/";
+    const SUPABASE_INSTANT =
+      "https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/tracebreak-instant-v2";
 
     const params = new URLSearchParams(location.search);
-    const query = (params.get("q") || "").replace(/\+/g, " ").trim();
+    const query = (params.get("q") || "")
+      .replace(/\+/g, " ")
+      .trim();
 
     const input = document.getElementById("query");
     const meta = document.getElementById("meta");
     const results = document.getElementById("results");
     const knowledge = document.getElementById("knowledge");
-    const knowledgeContent = document.getElementById("knowledge-content");
+    const knowledgeContent =
+      document.getElementById("knowledge-content");
+
+    const instant =
+      document.getElementById("instant");
+
+    const instantLabel =
+      document.getElementById("instant-label");
+
+    const instantValue =
+      document.getElementById("instant-value");
+
+    const instantSub =
+      document.getElementById("instant-sub");
 
     input.value = query;
 
     function encodeQuery(value) {
-      return value.trim().split(/\s+/).join("+");
+      return value
+        .trim()
+        .split(/\s+/)
+        .join("+");
     }
 
     function navigate(value) {
@@ -336,18 +393,19 @@
         return;
       }
 
-      location.href = "search.html?q=" + encodeQuery(value);
+      location.href =
+        "search.html?q=" +
+        encodeQuery(value);
     }
 
-    document.getElementById("search-form").addEventListener(
-      "submit",
-      event => {
+    document
+      .getElementById("search-form")
+      .addEventListener("submit", event => {
         event.preventDefault();
         navigate(input.value);
-      }
-    );
+      });
 
-    function makeFavicon(url) {
+    function faviconFor(url) {
       try {
         const parsed = new URL(url);
         const image = document.createElement("img");
@@ -370,38 +428,54 @@
     }
 
     function renderResult(item) {
-      const article = document.createElement("article");
-      article.className = "result";
-
-      const head = document.createElement("div");
-      head.className = "result-head";
-
-      const favicon = makeFavicon(item.url);
-
-      if (favicon) {
-        head.appendChild(favicon);
+      if (!item.url) {
+        return;
       }
 
-      const title = document.createElement("a");
+      const article =
+        document.createElement("article");
+
+      article.className = "result";
+
+      const head =
+        document.createElement("div");
+
+      head.className = "result-head";
+
+      const icon =
+        faviconFor(item.url);
+
+      if (icon) {
+        head.appendChild(icon);
+      }
+
+      const title =
+        document.createElement("a");
 
       title.className = "result-title";
       title.href = item.url;
       title.target = "_blank";
-      title.rel = "noopener noreferrer";
+      title.rel =
+        "noopener noreferrer";
+
       title.textContent =
         item.title ||
         item.url;
 
       head.appendChild(title);
 
-      const url = document.createElement("div");
+      const url =
+        document.createElement("div");
 
       url.className = "result-url";
       url.textContent = item.url;
 
-      const description = document.createElement("p");
+      const description =
+        document.createElement("p");
 
-      description.className = "description";
+      description.className =
+        "description";
+
       description.textContent =
         item.description ||
         "No description available.";
@@ -413,119 +487,99 @@
       results.appendChild(article);
     }
 
-    function wikipediaSlug(value) {
-      return value
-        .trim()
-        .replace(/\s+/g, "_");
-    }
+    async function tracebreakSearch() {
+      const endpoint =
+        SUPABASE_SEARCH +
+        "?q=" +
+        encodeQuery(query) +
+        "&limit=100";
 
-    async function wikipedia() {
-      try {
-        const response = await fetch(
-          WIKIPEDIA_API +
-          encodeURIComponent(wikipediaSlug(query)),
-          {
-            headers: {
-              "Accept": "application/json"
-            }
+      const response =
+        await fetch(endpoint, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
           }
+        });
+
+      if (!response.ok) {
+        throw new Error(
+          "TraceBreak search failed"
         );
-
-        if (!response.ok) {
-          return null;
-        }
-
-        const data = await response.json();
-
-        if (
-          !data.title ||
-          data.type === "disambiguation"
-        ) {
-          return null;
-        }
-
-        return {
-          title: data.title,
-          description:
-            data.extract ||
-            "",
-          image:
-            data.thumbnail?.source ||
-            data.originalimage?.source ||
-            "",
-          url:
-            data.content_urls?.desktop?.page ||
-            data.content_urls?.mobile?.page ||
-            ""
-        };
-      } catch {
-        return null;
       }
+
+      return response.json();
     }
 
-    async function duckDuckGo() {
-      try {
-        const url =
-          DDG_API +
-          "?q=" +
-          encodeURIComponent(query) +
-          "&format=json" +
-          "&no_html=1" +
-          "&skip_disambig=1";
+    async function instantSearch() {
+      const endpoint =
+        SUPABASE_INSTANT +
+        "?q=" +
+        encodeURIComponent(query);
 
-        const response = await fetch(url);
+      const response =
+        await fetch(endpoint, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
 
-        if (!response.ok) {
-          return null;
-        }
-
-        const data = await response.json();
-
-        if (
-          !data.AbstractText &&
-          !data.Heading &&
-          !data.Answer
-        ) {
-          return null;
-        }
-
-        return {
-          title:
-            data.Heading ||
-            "",
-          description:
-            data.AbstractText ||
-            data.Answer ||
-            "",
-          image:
-            data.Image ||
-            "",
-          url:
-            data.AbstractURL ||
-            ""
-        };
-      } catch {
-        return null;
+      if (!response.ok) {
+        throw new Error(
+          "Instant search failed"
+        );
       }
+
+      return response.json();
     }
 
-    function showKnowledge(wiki, ddg) {
-      if (!wiki && !ddg) {
+    function showKnowledge(data) {
+      if (!data) {
+        return;
+      }
+
+      const wiki =
+        data.wikipedia;
+
+      const ddg =
+        data.duckduckgo;
+
+      if (
+        (!wiki || !wiki.title) &&
+        (!ddg || (
+          !ddg.title &&
+          !ddg.description
+        ))
+      ) {
         return;
       }
 
       knowledgeContent.textContent = "";
 
-      const primary = wiki || ddg;
+      const primary =
+        wiki && wiki.title
+          ? wiki
+          : ddg;
 
-      const title = document.createElement("h2");
-      title.className = "knowledge-title";
-      title.textContent = primary.title;
+      const title =
+        document.createElement("h2");
 
-      const source = document.createElement("div");
-      source.className = "knowledge-source";
+      title.className =
+        "knowledge-title";
+
+      title.textContent =
+        primary.title ||
+        query;
+
+      const source =
+        document.createElement("div");
+
+      source.className =
+        "knowledge-source";
+
       source.textContent =
-        wiki
+        wiki && wiki.title
           ? "Wikipedia"
           : "DuckDuckGo";
 
@@ -533,11 +587,17 @@
       knowledgeContent.appendChild(source);
 
       if (primary.image) {
-        const image = document.createElement("img");
+        const image =
+          document.createElement("img");
 
-        image.className = "knowledge-image";
-        image.src = primary.image;
+        image.className =
+          "knowledge-image";
+
+        image.src =
+          primary.image;
+
         image.alt = "";
+
         image.loading = "lazy";
 
         image.onerror = () => {
@@ -548,7 +608,8 @@
       }
 
       if (primary.description) {
-        const description = document.createElement("p");
+        const description =
+          document.createElement("p");
 
         description.className =
           "knowledge-description";
@@ -556,83 +617,204 @@
         description.textContent =
           primary.description;
 
-        knowledgeContent.appendChild(description);
+        knowledgeContent.appendChild(
+          description
+        );
       }
 
       if (primary.url) {
-        const link = document.createElement("a");
+        const link =
+          document.createElement("a");
 
-        link.className = "knowledge-link";
-        link.href = primary.url;
+        link.className =
+          "knowledge-link";
+
+        link.href =
+          primary.url;
+
         link.target = "_blank";
-        link.rel = "noopener noreferrer";
+
+        link.rel =
+          "noopener noreferrer";
+
         link.textContent =
-          wiki
+          wiki && wiki.title
             ? "View on Wikipedia"
             : "Source";
 
-        knowledgeContent.appendChild(link);
+        knowledgeContent.appendChild(
+          link
+        );
       }
 
-      if (wiki && ddg && ddg.description) {
-        const block = document.createElement("div");
-        block.className = "knowledge-block";
+      if (
+        wiki &&
+        ddg &&
+        ddg.description
+      ) {
+        const block =
+          document.createElement("div");
 
-        const heading = document.createElement("h3");
-        heading.className =
-          "knowledge-block-title";
+        block.className =
+          "knowledge-block";
+
+        const heading =
+          document.createElement("h3");
+
         heading.textContent =
           "DuckDuckGo";
 
-        const text = document.createElement("p");
-        text.textContent =
+        const description =
+          document.createElement("p");
+
+        description.textContent =
           ddg.description;
 
         block.appendChild(heading);
-        block.appendChild(text);
+        block.appendChild(
+          description
+        );
 
         if (ddg.url) {
-          const link = document.createElement("a");
+          const link =
+            document.createElement("a");
 
           link.className =
             "knowledge-link";
-          link.href = ddg.url;
+
+          link.href =
+            ddg.url;
+
           link.target = "_blank";
+
           link.rel =
             "noopener noreferrer";
+
           link.textContent =
             "Source";
 
           block.appendChild(link);
         }
 
-        knowledgeContent.appendChild(block);
-      }
-
-      knowledge.classList.add("visible");
-    }
-
-    async function tracebreakSearch() {
-      const endpoint =
-        SUPABASE_SEARCH +
-        "?q=" +
-        encodeQuery(query) +
-        "&limit=100";
-
-      const response = await fetch(endpoint, {
-        method: "GET",
-        headers: {
-          "Accept": "application/json"
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          "TraceBreak search failed"
+        knowledgeContent.appendChild(
+          block
         );
       }
 
-      return response.json();
+      knowledge.classList.add(
+        "visible"
+      );
+    }
+
+    function calculate(expression) {
+      let value =
+        expression
+          .trim()
+          .replace(/,/g, "")
+          .replace(/\^/g, "**")
+          .replace(/\bpi\b/gi, "Math.PI")
+          .replace(/\be\b/g, "Math.E")
+          .replace(/\bsqrt\s*\(/gi, "Math.sqrt(")
+          .replace(/\bsin\s*\(/gi, "Math.sin(")
+          .replace(/\bcos\s*\(/gi, "Math.cos(")
+          .replace(/\btan\s*\(/gi, "Math.tan(")
+          .replace(/\blog\s*\(/gi, "Math.log10(")
+          .replace(/\bln\s*\(/gi, "Math.log(");
+
+      if (
+        !/^[0-9+\-*/().%\s_a-zA-Z*]+$/.test(value)
+      ) {
+        return null;
+      }
+
+      if (
+        /(?:Math\.){2,}|constructor|prototype|window|document|globalThis|Function|eval|import|fetch/i.test(value)
+      ) {
+        return null;
+      }
+
+      try {
+        const result =
+          Function(
+            "\"use strict\";return(" +
+            value +
+            ")"
+          )();
+
+        if (
+          typeof result !== "number" ||
+          !Number.isFinite(result)
+        ) {
+          return null;
+        }
+
+        return result;
+      } catch {
+        return null;
+      }
+    }
+
+    function calculator() {
+      if (
+        !/^[0-9+\-*/().%^,\s]+$/.test(query)
+      ) {
+        return null;
+      }
+
+      return calculate(query);
+    }
+
+    function showCalculator(value) {
+      instantLabel.textContent =
+        "Calculator";
+
+      instantValue.textContent =
+        Number.isInteger(value)
+          ? String(value)
+          : String(
+              Number(
+                value.toPrecision(12)
+              )
+            );
+
+      instantSub.textContent =
+        query;
+
+      instant.classList.add(
+        "visible"
+      );
+    }
+
+    function showWeather(data) {
+      if (
+        !data ||
+        data.type !== "weather"
+      ) {
+        return;
+      }
+
+      instantLabel.textContent =
+        "Weather";
+
+      instantValue.textContent =
+        data.temperature +
+        "°F";
+
+      instantSub.textContent =
+        data.location +
+        " · " +
+        data.condition +
+        " · Feels like " +
+        data.feels_like +
+        "°F · Humidity " +
+        data.humidity +
+        "% · Wind " +
+        data.wind_mph +
+        " mph";
+
+      instant.classList.add(
+        "visible"
+      );
     }
 
     async function run() {
@@ -644,21 +826,63 @@
         return;
       }
 
-      const searchPromise =
+      const calculation =
+        calculator();
+
+      if (calculation !== null) {
+        showCalculator(
+          calculation
+        );
+      }
+
+      const weatherQuery =
+        /^weather(?:\s+in)?\s+/i.test(
+          query
+        );
+
+      let searchPromise =
         tracebreakSearch();
 
-      const wikiPromise =
-        wikipedia();
+      let instantPromise =
+        instantSearch();
 
-      const ddgPromise =
-        duckDuckGo();
+      if (weatherQuery) {
+        instantPromise =
+          fetch(
+            SUPABASE_INSTANT +
+            "?type=weather&q=" +
+            encodeURIComponent(
+              query
+                .replace(
+                  /^weather(?:\s+in)?\s+/i,
+                  ""
+                )
+            ),
+            {
+              headers: {
+                "Accept":
+                  "application/json"
+              }
+            }
+          ).then(response => {
+            if (!response.ok) {
+              throw new Error(
+                "Weather failed"
+              );
+            }
+
+            return response.json();
+          });
+      }
 
       try {
         const data =
           await searchPromise;
 
         const list =
-          Array.isArray(data.results)
+          Array.isArray(
+            data.results
+          )
             ? data.results
             : [];
 
@@ -669,7 +893,9 @@
           meta.textContent =
             "No indexed results";
 
-          results.className = "empty";
+          results.className =
+            "empty";
+
           results.textContent =
             "TraceBreak hasn't indexed anything matching that query yet.";
         } else {
@@ -679,24 +905,33 @@
 
           list
             .slice(0, 20)
-            .forEach(renderResult);
+            .forEach(
+              renderResult
+            );
         }
       } catch (error) {
         console.error(error);
 
         meta.textContent = "";
-        results.className = "empty";
+        results.className =
+          "empty";
+
         results.textContent =
           "TraceBreak search is temporarily unavailable.";
       }
 
-      const [wiki, ddg] =
-        await Promise.all([
-          wikiPromise,
-          ddgPromise
-        ]);
+      try {
+        const data =
+          await instantPromise;
 
-      showKnowledge(wiki, ddg);
+        if (weatherQuery) {
+          showWeather(data);
+        } else {
+          showKnowledge(data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
 
     run();
