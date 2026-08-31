@@ -28,13 +28,13 @@
       top: 0;
       z-index: 10;
       padding: 15px 24px;
-      border-bottom: 1px solid #e8e8e8;
+      border-bottom: 1px solid #e7e7e7;
       background: #fffffff2;
       backdrop-filter: blur(9px);
     }
 
     .top {
-      width: min(1080px, 100%);
+      width: min(1120px, 100%);
       margin: auto;
       display: flex;
       align-items: center;
@@ -51,8 +51,8 @@
     }
 
     .search {
-      width: min(720px, 100%);
       display: flex;
+      width: min(720px, 100%);
       gap: 8px;
     }
 
@@ -64,8 +64,6 @@
       border: 1px solid #cfcfcf;
       border-radius: 6px;
       outline: none;
-      background: #fff;
-      color: #171717;
       font-size: 15px;
     }
 
@@ -89,15 +87,15 @@
     }
 
     .layout {
-      width: min(1080px, calc(100% - 48px));
+      width: min(1120px, calc(100% - 48px));
       margin: 30px auto 80px;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 290px;
+      grid-template-columns: minmax(0, 1fr) 310px;
       gap: 55px;
     }
 
     .meta {
-      margin-bottom: 24px;
+      margin-bottom: 25px;
       color: #777;
       font-size: 13px;
     }
@@ -122,11 +120,10 @@
     }
 
     .result-title {
-      display: block;
       color: #174ea6;
-      text-decoration: none;
       font-size: 19px;
       line-height: 1.25;
+      text-decoration: none;
     }
 
     .result-title:hover {
@@ -158,31 +155,42 @@
 
     .knowledge {
       display: none;
+      align-self: start;
       border-left: 1px solid #e5e5e5;
       padding-left: 24px;
     }
 
-    .knowledge.show {
+    .knowledge.visible {
       display: block;
     }
 
-    .knowledge h2 {
-      margin: 0 0 6px;
-      font-size: 22px;
-      letter-spacing: -0.5px;
+    .knowledge-label {
+      margin-bottom: 16px;
+      color: #777;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .knowledge-title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: -.5px;
     }
 
     .knowledge-source {
-      margin-bottom: 16px;
+      margin: 6px 0 16px;
       color: #777;
       font-size: 12px;
     }
 
     .knowledge-image {
+      display: block;
       width: 100%;
-      max-height: 180px;
-      margin-bottom: 15px;
-      border-radius: 6px;
+      max-height: 190px;
+      margin-bottom: 16px;
+      border-radius: 7px;
       object-fit: cover;
     }
 
@@ -195,7 +203,7 @@
 
     .knowledge-link {
       display: inline-block;
-      margin-top: 13px;
+      margin-top: 14px;
       color: #174ea6;
       font-size: 13px;
       text-decoration: none;
@@ -205,7 +213,25 @@
       text-decoration: underline;
     }
 
-    @media (max-width: 800px) {
+    .knowledge-block {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid #e8e8e8;
+    }
+
+    .knowledge-block-title {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+
+    .knowledge-block p {
+      margin: 0;
+      color: #555;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 850px) {
       .layout {
         grid-template-columns: 1fr;
         gap: 25px;
@@ -253,8 +279,14 @@
     <div class="top">
       <a class="brand" href="index.html">TraceBreak</a>
 
-      <form class="search" id="search">
-        <input id="query" name="q" type="search" autocomplete="off">
+      <form class="search" id="search-form">
+        <input
+          id="query"
+          name="q"
+          type="search"
+          autocomplete="off"
+          spellcheck="false"
+        >
         <button type="submit">Search</button>
       </form>
     </div>
@@ -267,20 +299,27 @@
     </section>
 
     <aside class="knowledge" id="knowledge">
+      <div class="knowledge-label">Knowledge</div>
       <div id="knowledge-content"></div>
     </aside>
   </main>
 
   <script>
-    const SUPABASE_FUNCTION =
-      "https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/tracebreak-search";
+    const SUPABASE_SEARCH =
+      "https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/tracebreak-search-v2";
+
+    const WIKIPEDIA_API =
+      "https://en.wikipedia.org/api/rest_v1/page/summary/";
+
+    const DDG_API =
+      "https://api.duckduckgo.com/";
 
     const params = new URLSearchParams(location.search);
-    const query = params.get("q") || "";
+    const query = (params.get("q") || "").replace(/\+/g, " ").trim();
 
     const input = document.getElementById("query");
-    const results = document.getElementById("results");
     const meta = document.getElementById("meta");
+    const results = document.getElementById("results");
     const knowledge = document.getElementById("knowledge");
     const knowledgeContent = document.getElementById("knowledge-content");
 
@@ -290,48 +329,57 @@
       return value.trim().split(/\s+/).join("+");
     }
 
-    function searchUrl(value) {
-      return "search.html?q=" + encodeQuery(value);
-    }
-
-    document.getElementById("search").addEventListener("submit", event => {
-      event.preventDefault();
-
-      const value = input.value.trim();
+    function navigate(value) {
+      value = value.trim();
 
       if (!value) {
         return;
       }
 
-      location.href = searchUrl(value);
-    });
+      location.href = "search.html?q=" + encodeQuery(value);
+    }
 
-    function getFavicon(item) {
-      if (item.favicon) {
+    document.getElementById("search-form").addEventListener(
+      "submit",
+      event => {
+        event.preventDefault();
+        navigate(input.value);
+      }
+    );
+
+    function makeFavicon(url) {
+      try {
+        const parsed = new URL(url);
         const image = document.createElement("img");
 
         image.className = "favicon";
-        image.src = item.favicon;
         image.alt = "";
         image.loading = "lazy";
+        image.src =
+          parsed.origin +
+          "/favicon.ico";
+
+        image.onerror = () => {
+          image.remove();
+        };
 
         return image;
+      } catch {
+        return null;
       }
-
-      return null;
     }
 
-    function addResult(item) {
+    function renderResult(item) {
       const article = document.createElement("article");
       article.className = "result";
 
       const head = document.createElement("div");
       head.className = "result-head";
 
-      const icon = getFavicon(item);
+      const favicon = makeFavicon(item.url);
 
-      if (icon) {
-        head.appendChild(icon);
+      if (favicon) {
+        head.appendChild(favicon);
       }
 
       const title = document.createElement("a");
@@ -340,14 +388,16 @@
       title.href = item.url;
       title.target = "_blank";
       title.rel = "noopener noreferrer";
-      title.textContent = item.title || item.url;
+      title.textContent =
+        item.title ||
+        item.url;
 
       head.appendChild(title);
 
-      const resultUrl = document.createElement("div");
+      const url = document.createElement("div");
 
-      resultUrl.className = "result-url";
-      resultUrl.textContent = item.url;
+      url.className = "result-url";
+      url.textContent = item.url;
 
       const description = document.createElement("p");
 
@@ -357,127 +407,299 @@
         "No description available.";
 
       article.appendChild(head);
-      article.appendChild(resultUrl);
+      article.appendChild(url);
       article.appendChild(description);
 
       results.appendChild(article);
     }
 
-    function showKnowledge(data) {
-      const panel = data.knowledge;
+    function wikipediaSlug(value) {
+      return value
+        .trim()
+        .replace(/\s+/g, "_");
+    }
 
-      if (!panel || !panel.title) {
+    async function wikipedia() {
+      try {
+        const response = await fetch(
+          WIKIPEDIA_API +
+          encodeURIComponent(wikipediaSlug(query)),
+          {
+            headers: {
+              "Accept": "application/json"
+            }
+          }
+        );
+
+        if (!response.ok) {
+          return null;
+        }
+
+        const data = await response.json();
+
+        if (
+          !data.title ||
+          data.type === "disambiguation"
+        ) {
+          return null;
+        }
+
+        return {
+          title: data.title,
+          description:
+            data.extract ||
+            "",
+          image:
+            data.thumbnail?.source ||
+            data.originalimage?.source ||
+            "",
+          url:
+            data.content_urls?.desktop?.page ||
+            data.content_urls?.mobile?.page ||
+            ""
+        };
+      } catch {
+        return null;
+      }
+    }
+
+    async function duckDuckGo() {
+      try {
+        const url =
+          DDG_API +
+          "?q=" +
+          encodeURIComponent(query) +
+          "&format=json" +
+          "&no_html=1" +
+          "&skip_disambig=1";
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          return null;
+        }
+
+        const data = await response.json();
+
+        if (
+          !data.AbstractText &&
+          !data.Heading &&
+          !data.Answer
+        ) {
+          return null;
+        }
+
+        return {
+          title:
+            data.Heading ||
+            "",
+          description:
+            data.AbstractText ||
+            data.Answer ||
+            "",
+          image:
+            data.Image ||
+            "",
+          url:
+            data.AbstractURL ||
+            ""
+        };
+      } catch {
+        return null;
+      }
+    }
+
+    function showKnowledge(wiki, ddg) {
+      if (!wiki && !ddg) {
         return;
       }
 
       knowledgeContent.textContent = "";
 
+      const primary = wiki || ddg;
+
       const title = document.createElement("h2");
-      title.textContent = panel.title;
+      title.className = "knowledge-title";
+      title.textContent = primary.title;
 
       const source = document.createElement("div");
       source.className = "knowledge-source";
-      source.textContent = panel.source || "Knowledge";
+      source.textContent =
+        wiki
+          ? "Wikipedia"
+          : "DuckDuckGo";
 
       knowledgeContent.appendChild(title);
       knowledgeContent.appendChild(source);
 
-      if (panel.image_url) {
+      if (primary.image) {
         const image = document.createElement("img");
 
         image.className = "knowledge-image";
-        image.src = panel.image_url;
+        image.src = primary.image;
         image.alt = "";
         image.loading = "lazy";
+
+        image.onerror = () => {
+          image.remove();
+        };
 
         knowledgeContent.appendChild(image);
       }
 
-      if (panel.description) {
+      if (primary.description) {
         const description = document.createElement("p");
 
-        description.className = "knowledge-description";
-        description.textContent = panel.description;
+        description.className =
+          "knowledge-description";
+
+        description.textContent =
+          primary.description;
 
         knowledgeContent.appendChild(description);
       }
 
-      if (panel.source_url) {
+      if (primary.url) {
         const link = document.createElement("a");
 
         link.className = "knowledge-link";
-        link.href = panel.source_url;
+        link.href = primary.url;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
-        link.textContent = "Read more";
+        link.textContent =
+          wiki
+            ? "View on Wikipedia"
+            : "Source";
 
         knowledgeContent.appendChild(link);
       }
 
-      knowledge.classList.add("show");
+      if (wiki && ddg && ddg.description) {
+        const block = document.createElement("div");
+        block.className = "knowledge-block";
+
+        const heading = document.createElement("h3");
+        heading.className =
+          "knowledge-block-title";
+        heading.textContent =
+          "DuckDuckGo";
+
+        const text = document.createElement("p");
+        text.textContent =
+          ddg.description;
+
+        block.appendChild(heading);
+        block.appendChild(text);
+
+        if (ddg.url) {
+          const link = document.createElement("a");
+
+          link.className =
+            "knowledge-link";
+          link.href = ddg.url;
+          link.target = "_blank";
+          link.rel =
+            "noopener noreferrer";
+          link.textContent =
+            "Source";
+
+          block.appendChild(link);
+        }
+
+        knowledgeContent.appendChild(block);
+      }
+
+      knowledge.classList.add("visible");
     }
 
-    async function search() {
-      if (!query.trim()) {
+    async function tracebreakSearch() {
+      const endpoint =
+        SUPABASE_SEARCH +
+        "?q=" +
+        encodeQuery(query) +
+        "&limit=100";
+
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          "TraceBreak search failed"
+        );
+      }
+
+      return response.json();
+    }
+
+    async function run() {
+      if (!query) {
         meta.textContent = "";
         results.className = "empty";
-        results.textContent = "Enter a search query.";
+        results.textContent =
+          "Enter a search query.";
         return;
       }
 
+      const searchPromise =
+        tracebreakSearch();
+
+      const wikiPromise =
+        wikipedia();
+
+      const ddgPromise =
+        duckDuckGo();
+
       try {
-        const request =
-          SUPABASE_FUNCTION +
-          "?q=" +
-          encodeQuery(query) +
-          "&limit=100";
+        const data =
+          await searchPromise;
 
-        const response = await fetch(request, {
-          method: "GET",
-          headers: {
-            "Accept": "application/json"
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error("Search request failed");
-        }
-
-        const data = await response.json();
-        const list = Array.isArray(data.results)
-          ? data.results
-          : [];
+        const list =
+          Array.isArray(data.results)
+            ? data.results
+            : [];
 
         results.textContent = "";
         results.className = "";
 
         if (!list.length) {
-          meta.textContent = "No results";
+          meta.textContent =
+            "No indexed results";
+
           results.className = "empty";
-          results.textContent = "Nothing matched that query.";
-          return;
+          results.textContent =
+            "TraceBreak hasn't indexed anything matching that query yet.";
+        } else {
+          meta.textContent =
+            list.length +
+            " indexed results";
+
+          list
+            .slice(0, 20)
+            .forEach(renderResult);
         }
-
-        meta.textContent =
-          list.length +
-          " results";
-
-        list
-          .slice(0, 20)
-          .forEach(addResult);
-
-        showKnowledge(data);
       } catch (error) {
         console.error(error);
 
         meta.textContent = "";
         results.className = "empty";
         results.textContent =
-          "Search is temporarily unavailable.";
+          "TraceBreak search is temporarily unavailable.";
       }
+
+      const [wiki, ddg] =
+        await Promise.all([
+          wikiPromise,
+          ddgPromise
+        ]);
+
+      showKnowledge(wiki, ddg);
     }
 
-    search();
+    run();
   </script>
 </body>
 </html>
