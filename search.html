@@ -8,42 +8,314 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 
 <style>
-:root{font-family:Arial,Helvetica,sans-serif;color:#171717;background:#fff}
-*{box-sizing:border-box}
-body{margin:0;background:#fff}
-header{position:sticky;top:0;z-index:10;padding:14px 24px;border-bottom:1px solid #e7e7e7;background:rgba(255,255,255,.95);backdrop-filter:blur(10px)}
-.top{width:min(1120px,100%);margin:auto;display:flex;align-items:center;gap:24px}
-.brand{color:#171717;text-decoration:none;font-size:20px;font-weight:700;letter-spacing:-1px}
-.search{display:flex;width:min(760px,100%);gap:8px}
-.search input{width:100%;height:42px;padding:0 14px;border:1px solid #ccc;border-radius:7px;outline:0;font-size:15px}
-.search input:focus{border-color:#777;box-shadow:0 0 0 3px rgba(0,0,0,.05)}
-.search button{height:42px;padding:0 18px;border:0;border-radius:7px;background:#171717;color:white;cursor:pointer}
-.layout{width:min(1120px,calc(100% - 48px));margin:30px auto 80px;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:50px}
-.meta{margin-bottom:22px;color:#777;font-size:13px}
-.correction{display:none;margin-bottom:18px;padding:10px 13px;border-radius:6px;background:#f5f5f5;color:#555;font-size:13px}
-.correction.visible{display:block}
-.correction a{color:#174ea6;text-decoration:none;font-weight:600}
-.result{margin-bottom:30px}
-.result-head{display:flex;align-items:flex-start;gap:9px}
-.favicon{width:20px;height:20px;margin-top:2px;object-fit:contain;border-radius:4px}
-.result-title{color:#174ea6;font-size:19px;line-height:1.3;text-decoration:none}
-.result-title:hover{text-decoration:underline}
-.result-url{margin:5px 0 4px 29px;color:#28743b;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.description{margin:0 0 0 29px;max-width:760px;color:#4b4b4b;font-size:14px;line-height:1.55}
-.provider{margin:34px 0 18px;padding-bottom:9px;border-bottom:1px solid #e5e5e5;color:#777;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
-.external-status{margin:-7px 0 20px;color:#999;font-size:12px}
-.empty{padding:40px 0;color:#777;font-size:14px}
-.knowledge{display:none;border-left:1px solid #e5e5e5;padding-left:24px}
-.knowledge.visible{display:block}
-.knowledge-label{margin-bottom:15px;color:#777;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
-.knowledge-title{margin:0;font-size:24px;line-height:1.2}
-.knowledge-source{margin:6px 0 15px;color:#777;font-size:12px}
-.knowledge-image{width:100%;max-height:190px;object-fit:cover;border-radius:7px;margin-bottom:14px}
-.knowledge-description{margin:0;color:#444;font-size:14px;line-height:1.55}
-.knowledge-link{display:inline-block;margin-top:13px;color:#174ea6;font-size:13px;text-decoration:none}
-.knowledge-link:hover{text-decoration:underline}
-@media(max-width:850px){.layout{grid-template-columns:1fr}.knowledge{border-left:0;border-top:1px solid #e5e5e5;padding:25px 0 0}}
-@media(max-width:600px){header{padding:13px 16px}.top{gap:14px}.search button{display:none}.layout{width:calc(100% - 32px);margin-top:24px}.result-url,.description{margin-left:0}}
+:root{
+  font-family:Arial,Helvetica,sans-serif;
+  color:#171717;
+  background:#fff
+}
+
+*{
+  box-sizing:border-box
+}
+
+body{
+  margin:0;
+  background:#fff
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  padding:14px 24px;
+  border-bottom:1px solid #e7e7e7;
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(12px)
+}
+
+.top{
+  width:min(1120px,100%);
+  margin:auto;
+  display:flex;
+  align-items:center;
+  gap:24px
+}
+
+.brand{
+  color:#171717;
+  text-decoration:none;
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:-1px;
+  white-space:nowrap
+}
+
+.search{
+  display:flex;
+  width:min(760px,100%);
+  gap:8px
+}
+
+.search input{
+  width:100%;
+  height:42px;
+  padding:0 14px;
+  border:1px solid #ccc;
+  border-radius:7px;
+  outline:0;
+  color:#171717;
+  background:#fff;
+  font-size:15px
+}
+
+.search input:focus{
+  border-color:#777;
+  box-shadow:0 0 0 3px rgba(0,0,0,.05)
+}
+
+.search button{
+  height:42px;
+  padding:0 18px;
+  border:0;
+  border-radius:7px;
+  background:#171717;
+  color:#fff;
+  cursor:pointer
+}
+
+.search button:hover{
+  background:#303030
+}
+
+.layout{
+  width:min(1120px,calc(100% - 48px));
+  margin:30px auto 90px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 310px;
+  gap:50px
+}
+
+.meta{
+  margin-bottom:22px;
+  color:#777;
+  font-size:13px
+}
+
+.correction{
+  display:none;
+  margin-bottom:18px;
+  padding:10px 13px;
+  border-radius:6px;
+  background:#f5f5f5;
+  color:#555;
+  font-size:13px
+}
+
+.correction.visible{
+  display:block
+}
+
+.correction a{
+  color:#174ea6;
+  text-decoration:none;
+  font-weight:600
+}
+
+.result{
+  margin-bottom:30px;
+  animation:appear .18s ease-out
+}
+
+@keyframes appear{
+  from{
+    opacity:0;
+    transform:translateY(4px)
+  }
+  to{
+    opacity:1;
+    transform:translateY(0)
+  }
+}
+
+.result-head{
+  display:flex;
+  align-items:flex-start;
+  gap:9px
+}
+
+.favicon{
+  width:20px;
+  height:20px;
+  margin-top:2px;
+  flex:0 0 20px;
+  object-fit:contain;
+  border-radius:4px
+}
+
+.result-title{
+  color:#174ea6;
+  font-size:19px;
+  line-height:1.3;
+  text-decoration:none
+}
+
+.result-title:hover{
+  text-decoration:underline
+}
+
+.result-url{
+  margin:5px 0 4px 29px;
+  overflow:hidden;
+  color:#28743b;
+  font-size:13px;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.description{
+  max-width:760px;
+  margin:0 0 0 29px;
+  color:#4b4b4b;
+  font-size:14px;
+  line-height:1.55
+}
+
+.empty{
+  padding:40px 0;
+  color:#777;
+  font-size:14px
+}
+
+.knowledge{
+  display:none;
+  align-self:start;
+  border-left:1px solid #e5e5e5;
+  padding-left:24px
+}
+
+.knowledge.visible{
+  display:block
+}
+
+.knowledge-label{
+  margin-bottom:15px;
+  color:#777;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase
+}
+
+.knowledge-title{
+  margin:0;
+  font-size:24px;
+  line-height:1.2;
+  letter-spacing:-.6px
+}
+
+.knowledge-source{
+  margin:6px 0 15px;
+  color:#777;
+  font-size:12px
+}
+
+.knowledge-image{
+  display:block;
+  width:100%;
+  max-height:190px;
+  margin-bottom:15px;
+  border-radius:7px;
+  object-fit:cover
+}
+
+.knowledge-description{
+  margin:0;
+  color:#444;
+  font-size:14px;
+  line-height:1.55
+}
+
+.knowledge-link{
+  display:inline-block;
+  margin-top:13px;
+  color:#174ea6;
+  font-size:13px;
+  text-decoration:none
+}
+
+.instant{
+  display:none;
+  margin-bottom:22px;
+  padding:16px;
+  border:1px solid #e5e5e5;
+  border-radius:8px;
+  background:#fafafa
+}
+
+.instant.visible{
+  display:block
+}
+
+.instant-label{
+  margin-bottom:7px;
+  color:#777;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase
+}
+
+.instant-value{
+  font-size:28px;
+  font-weight:600;
+  letter-spacing:-.6px
+}
+
+.instant-sub{
+  margin-top:5px;
+  color:#666;
+  font-size:13px
+}
+
+@media(max-width:850px){
+  .layout{
+    grid-template-columns:1fr
+  }
+
+  .knowledge{
+    border-top:1px solid #e5e5e5;
+    border-left:0;
+    padding:25px 0 0
+  }
+}
+
+@media(max-width:600px){
+  header{
+    padding:13px 16px
+  }
+
+  .top{
+    gap:14px
+  }
+
+  .brand{
+    font-size:18px
+  }
+
+  .search button{
+    display:none
+  }
+
+  .layout{
+    width:calc(100% - 32px);
+    margin-top:24px
+  }
+
+  .result-url,
+  .description{
+    margin-left:0
+  }
+}
 </style>
 </head>
 
@@ -51,410 +323,739 @@ header{position:sticky;top:0;z-index:10;padding:14px 24px;border-bottom:1px soli
 
 <header>
 <div class="top">
+
 <a class="brand" href="index.html">TraceBreak</a>
+
 <form class="search" id="search-form">
-<input id="query" name="q" type="search" autocomplete="off" spellcheck="false">
-<button>Search</button>
+<input
+id="query"
+name="q"
+type="search"
+autocomplete="off"
+spellcheck="false">
+<button type="submit">Search</button>
 </form>
+
 </div>
 </header>
 
 <main class="layout">
 
 <section>
+
 <div class="correction" id="correction"></div>
-<div class="meta" id="meta">Searching TraceBreak...</div>
 
-<div id="local-results"></div>
+<div class="instant" id="instant">
+<div class="instant-label" id="instant-label"></div>
+<div class="instant-value" id="instant-value"></div>
+<div class="instant-sub" id="instant-sub"></div>
+</div>
 
-<div id="external-results"></div>
+<div class="meta" id="meta">
+Searching...
+</div>
+
+<div id="results"></div>
+
 </section>
 
 <aside class="knowledge" id="knowledge">
-<div class="knowledge-label">Knowledge</div>
+
+<div class="knowledge-label">
+Knowledge
+</div>
+
 <div id="knowledge-content"></div>
+
 </aside>
 
 </main>
 
 <script>
-const BASE="https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/";
+const BASE=
+"https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/";
 
-const SEARCH=BASE+"tracebreak-search-v2";
-const META=BASE+"tracebreak-meta";
-const INSTANT=BASE+"tracebreak-instant-v2";
+const SEARCH=
+BASE+"tracebreak-search-v2";
 
-const params=new URLSearchParams(location.search);
-const query=(params.get("q")||"").trim();
+const META=
+BASE+"tracebreak-meta";
 
-const input=document.getElementById("query");
-const meta=document.getElementById("meta");
-const localResults=document.getElementById("local-results");
-const externalResults=document.getElementById("external-results");
-const correction=document.getElementById("correction");
-const knowledge=document.getElementById("knowledge");
-const knowledgeContent=document.getElementById("knowledge-content");
+const INSTANT=
+BASE+"tracebreak-instant-v2";
 
-input.value=query.replace(/\+/g," ");
+const params=
+new URLSearchParams(location.search);
+
+const query=
+(params.get("q")||"").trim();
+
+const input=
+document.getElementById("query");
+
+const meta=
+document.getElementById("meta");
+
+const results=
+document.getElementById("results");
+
+const correction=
+document.getElementById("correction");
+
+const knowledge=
+document.getElementById("knowledge");
+
+const knowledgeContent=
+document.getElementById("knowledge-content");
+
+const instant=
+document.getElementById("instant");
+
+const instantLabel=
+document.getElementById("instant-label");
+
+const instantValue=
+document.getElementById("instant-value");
+
+const instantSub=
+document.getElementById("instant-sub");
+
+const seen=
+new Set();
+
+input.value=
+query.replace(/\+/g," ");
 
 function encodeQuery(value){
-    let out="";
-    for(const char of value.trim()){
-        out+=char==="+"?"+":encodeURIComponent(char);
-    }
-    return out;
+  let output="";
+
+  for(const char of value.trim()){
+    output+=
+      char==="+"?
+      "+":
+      encodeURIComponent(char);
+  }
+
+  return output;
 }
 
-function search(value){
-    value=value.trim();
-    if(!value)return;
-    location.href="search.html?q="+encodeQuery(value);
+function navigate(value){
+  value=value.trim();
+
+  if(!value){
+    return;
+  }
+
+  location.href=
+    "search.html?q="+
+    encodeQuery(value);
 }
 
-document.getElementById("search-form").addEventListener("submit",e=>{
-    e.preventDefault();
-    search(input.value);
+document
+.getElementById("search-form")
+.addEventListener("submit",event=>{
+  event.preventDefault();
+  navigate(input.value);
 });
 
-function favicon(url){
-    try{
-        const u=new URL(url);
-        const img=document.createElement("img");
-        img.className="favicon";
-        img.alt="";
-        img.loading="lazy";
-        img.src=u.origin+"/favicon.ico";
-        img.onerror=()=>img.remove();
-        return img;
-    }catch{
-        return null;
-    }
-}
+function canonical(url){
+  try{
+    const u=
+      new URL(url);
 
-function renderResult(item){
-    if(!item||!item.url)return null;
+    u.hash="";
 
-    const article=document.createElement("article");
-    article.className="result";
-
-    const head=document.createElement("div");
-    head.className="result-head";
-
-    const icon=favicon(item.url);
-    if(icon)head.appendChild(icon);
-
-    const title=document.createElement("a");
-    title.className="result-title";
-    title.href=item.url;
-    title.target="_blank";
-    title.rel="noopener noreferrer";
-    title.textContent=item.title||item.url;
-
-    head.appendChild(title);
-
-    const url=document.createElement("div");
-    url.className="result-url";
-    url.textContent=item.url;
-
-    const desc=document.createElement("p");
-    desc.className="description";
-    desc.textContent=item.description||"";
-
-    article.appendChild(head);
-    article.appendChild(url);
-    article.appendChild(desc);
-
-    return article;
-}
-
-function renderResults(items,target){
-    if(!Array.isArray(items))return 0;
-
-    let count=0;
-
-    for(const item of items.slice(0,20)){
-        const result=renderResult(item);
-        if(result){
-            target.appendChild(result);
-            count++;
-        }
-    }
-
-    return count;
-}
-
-function providerHeader(name){
-    const div=document.createElement("div");
-    div.className="provider";
-    div.textContent=name;
-    return div;
-}
-
-function providerStatus(name,text){
-    const div=document.createElement("div");
-    div.className="external-status";
-    div.textContent=name+" · "+text;
-    return div;
-}
-
-async function tracebreak(){
-    const url=SEARCH+
-        "?q="+encodeQuery(query)+
-        "&limit=100";
-
-    const response=await fetch(url,{
-        headers:{Accept:"application/json"}
+    [
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "utm_term",
+      "utm_content",
+      "gclid",
+      "fbclid",
+      "msclkid",
+      "dclid",
+      "yclid"
+    ].forEach(key=>{
+      u.searchParams.delete(key);
     });
 
+    return u.toString();
+  }catch{
+    return url;
+  }
+}
+
+function makeFavicon(url){
+  try{
+    const parsed=
+      new URL(url);
+
+    const image=
+      document.createElement("img");
+
+    image.className=
+      "favicon";
+
+    image.alt="";
+
+    image.loading=
+      "lazy";
+
+    image.src=
+      parsed.origin+
+      "/favicon.ico";
+
+    image.onerror=()=>{
+      image.remove();
+    };
+
+    return image;
+  }catch{
+    return null;
+  }
+}
+
+function addResult(item){
+  if(!item||!item.url){
+    return false;
+  }
+
+  const key=
+    canonical(item.url);
+
+  if(!key||seen.has(key)){
+    return false;
+  }
+
+  seen.add(key);
+
+  const article=
+    document.createElement("article");
+
+  article.className=
+    "result";
+
+  const head=
+    document.createElement("div");
+
+  head.className=
+    "result-head";
+
+  const icon=
+    item.favicon?
+    (() => {
+      const image=
+        document.createElement("img");
+
+      image.className=
+        "favicon";
+
+      image.alt="";
+
+      image.loading=
+        "lazy";
+
+      image.src=
+        item.favicon;
+
+      image.onerror=()=>{
+        image.src=
+          new URL(item.url).origin+
+          "/favicon.ico";
+      };
+
+      return image;
+    })():
+    makeFavicon(item.url);
+
+  if(icon){
+    head.appendChild(icon);
+  }
+
+  const title=
+    document.createElement("a");
+
+  title.className=
+    "result-title";
+
+  title.href=
+    item.url;
+
+  title.target=
+    "_blank";
+
+  title.rel=
+    "noopener noreferrer";
+
+  title.textContent=
+    item.title||
+    item.url;
+
+  head.appendChild(title);
+
+  const url=
+    document.createElement("div");
+
+  url.className=
+    "result-url";
+
+  url.textContent=
+    item.url;
+
+  const description=
+    document.createElement("p");
+
+  description.className=
+    "description";
+
+  description.textContent=
+    item.description||
+    "";
+
+  article.appendChild(head);
+  article.appendChild(url);
+  article.appendChild(description);
+
+  results.appendChild(article);
+
+  return true;
+}
+
+function addResults(items){
+  if(!Array.isArray(items)){
+    return 0;
+  }
+
+  let count=0;
+
+  for(const item of items){
+    if(addResult(item)){
+      count++;
+    }
+  }
+
+  return count;
+}
+
+async function localSearch(){
+  const response=
+    await fetch(
+      SEARCH+
+      "?q="+
+      encodeQuery(query)+
+      "&limit=100",
+      {
+        headers:{
+          Accept:
+            "application/json"
+        }
+      }
+    );
+
+  if(!response.ok){
+    throw new Error(
+      "TraceBreak search failed"
+    );
+  }
+
+  return response.json();
+}
+
+async function externalSearch(provider){
+  const controller=
+    new AbortController();
+
+  const timeout=
+    setTimeout(
+      ()=>controller.abort(),
+      6500
+    );
+
+  try{
+    const response=
+      await fetch(
+        META+
+        "?q="+
+        encodeQuery(query)+
+        "&type=web"+
+        "&limit=20"+
+        "&provider="+
+        provider,
+        {
+          signal:
+            controller.signal,
+          headers:{
+            Accept:
+              "application/json"
+          }
+        }
+      );
+
     if(!response.ok){
-        throw new Error("TraceBreak search failed");
+      throw new Error(
+        provider+
+        " search failed"
+      );
     }
 
     return response.json();
+
+  }finally{
+    clearTimeout(timeout);
+  }
 }
 
-async function provider(name){
-    const controller=new AbortController();
-    const timer=setTimeout(()=>controller.abort(),6500);
-
-    try{
-        const url=META+
-            "?q="+encodeQuery(query)+
-            "&type=web"+
-            "&limit=20"+
-            "&provider="+encodeURIComponent(name);
-
-        const response=await fetch(url,{
-            signal:controller.signal,
-            headers:{Accept:"application/json"}
-        });
-
-        if(!response.ok){
-            throw new Error(name+" failed");
+async function lookupKnowledge(){
+  try{
+    const response=
+      await fetch(
+        INSTANT+
+        "?q="+
+        encodeQuery(query),
+        {
+          headers:{
+            Accept:
+              "application/json"
+          }
         }
+      );
 
-        return await response.json();
-    }finally{
-        clearTimeout(timer);
+    if(response.ok){
+      showKnowledge(
+        await response.json()
+      );
     }
-}
-
-function showCorrection(data){
-    const corrected=data?.corrected_query;
-
-    if(!corrected||
-       corrected.toLowerCase()===query.toLowerCase()){
-        return;
-    }
-
-    correction.textContent="Showing results for ";
-
-    const link=document.createElement("a");
-    link.href="search.html?q="+encodeQuery(corrected);
-    link.textContent=corrected;
-
-    correction.appendChild(link);
-    correction.classList.add("visible");
+  }catch(error){
+    console.error(error);
+  }
 }
 
 function showKnowledge(data){
-    const wiki=data?.wikipedia;
-    const ddg=data?.duckduckgo;
-    const item=wiki?.title?wiki:ddg;
+  const wiki=
+    data?.wikipedia;
 
-    if(!item?.title&&!item?.description)return;
+  const ddg=
+    data?.duckduckgo;
 
-    knowledgeContent.textContent="";
+  const item=
+    wiki?.title?
+    wiki:
+    ddg;
 
-    const title=document.createElement("h2");
-    title.className="knowledge-title";
-    title.textContent=item.title||query;
+  if(
+    !item?.title&&
+    !item?.description
+  ){
+    return;
+  }
 
-    const source=document.createElement("div");
-    source.className="knowledge-source";
-    source.textContent=wiki?.title?"Wikipedia":"DuckDuckGo";
+  knowledgeContent.textContent=
+    "";
 
-    knowledgeContent.appendChild(title);
-    knowledgeContent.appendChild(source);
+  const title=
+    document.createElement("h2");
 
-    if(item.image){
-        const image=document.createElement("img");
-        image.className="knowledge-image";
-        image.src=item.image;
-        image.alt="";
-        image.loading="lazy";
-        image.onerror=()=>image.remove();
-        knowledgeContent.appendChild(image);
-    }
+  title.className=
+    "knowledge-title";
 
-    if(item.description){
-        const description=document.createElement("p");
-        description.className="knowledge-description";
-        description.textContent=item.description;
-        knowledgeContent.appendChild(description);
-    }
+  title.textContent=
+    item.title||
+    query;
 
-    if(item.url){
-        const link=document.createElement("a");
-        link.className="knowledge-link";
-        link.href=item.url;
-        link.target="_blank";
-        link.rel="noopener noreferrer";
-        link.textContent="Source";
-        knowledgeContent.appendChild(link);
-    }
+  const source=
+    document.createElement("div");
 
-    knowledge.classList.add("visible");
+  source.className=
+    "knowledge-source";
+
+  source.textContent=
+    wiki?.title?
+    "Wikipedia":
+    "DuckDuckGo";
+
+  knowledgeContent.appendChild(title);
+  knowledgeContent.appendChild(source);
+
+  if(item.image){
+    const image=
+      document.createElement("img");
+
+    image.className=
+      "knowledge-image";
+
+    image.src=
+      item.image;
+
+    image.alt="";
+
+    image.loading=
+      "lazy";
+
+    image.onerror=()=>{
+      image.remove();
+    };
+
+    knowledgeContent.appendChild(image);
+  }
+
+  if(item.description){
+    const description=
+      document.createElement("p");
+
+    description.className=
+      "knowledge-description";
+
+    description.textContent=
+      item.description;
+
+    knowledgeContent.appendChild(
+      description
+    );
+  }
+
+  if(item.url){
+    const link=
+      document.createElement("a");
+
+    link.className=
+      "knowledge-link";
+
+    link.href=
+      item.url;
+
+    link.target=
+      "_blank";
+
+    link.rel=
+      "noopener noreferrer";
+
+    link.textContent=
+      "Source";
+
+    knowledgeContent.appendChild(link);
+  }
+
+  knowledge.classList.add(
+    "visible"
+  );
 }
 
-async function knowledgeLookup(){
-    try{
-        const response=await fetch(
-            INSTANT+"?q="+encodeQuery(query),
-            {headers:{Accept:"application/json"}}
-        );
+function calculate(value){
+  let expression=
+    value
+      .replace(/,/g,"")
+      .replace(/\^/g,"**")
+      .replace(/\bpi\b/gi,"Math.PI")
+      .replace(/\be\b/g,"Math.E")
+      .replace(/\bsqrt\s*\(/gi,"Math.sqrt(")
+      .replace(/\bsin\s*\(/gi,"Math.sin(")
+      .replace(/\bcos\s*\(/gi,"Math.cos(")
+      .replace(/\btan\s*\(/gi,"Math.tan(")
+      .replace(/\blog\s*\(/gi,"Math.log10(")
+      .replace(/\bln\s*\(/gi,"Math.log(");
 
-        if(response.ok){
-            showKnowledge(await response.json());
-        }
-    }catch(error){
-        console.error(error);
+  if(
+    !/^[0-9+\-*/().%\s_a-zA-Z*]+$/.test(
+      expression
+    )
+  ){
+    return null;
+  }
+
+  if(
+    /constructor|prototype|window|document|globalThis|Function|eval|import|fetch/i.test(
+      expression
+    )
+  ){
+    return null;
+  }
+
+  try{
+    const result=
+      Function(
+        "\"use strict\";return("+
+        expression+
+        ")"
+      )();
+
+    if(
+      typeof result!=="number"||
+      !Number.isFinite(result)
+    ){
+      return null;
     }
+
+    return result;
+  }catch{
+    return null;
+  }
+}
+
+function showCalculator(value){
+  instantLabel.textContent=
+    "Calculator";
+
+  instantValue.textContent=
+    Number.isInteger(value)?
+    String(value):
+    String(
+      Number(
+        value.toPrecision(12)
+      )
+    );
+
+  instantSub.textContent=
+    query;
+
+  instant.classList.add(
+    "visible"
+  );
+}
+
+function showCorrection(data){
+  const corrected=
+    data?.corrected_query;
+
+  if(
+    !corrected||
+    corrected.toLowerCase()===
+    query.toLowerCase()
+  ){
+    return;
+  }
+
+  correction.textContent=
+    "Showing results for ";
+
+  const link=
+    document.createElement("a");
+
+  link.href=
+    "search.html?q="+
+    encodeQuery(corrected);
+
+  link.textContent=
+    corrected;
+
+  correction.appendChild(link);
+
+  correction.classList.add(
+    "visible"
+  );
 }
 
 async function run(){
-    if(!query){
-        meta.textContent="";
-        localResults.className="empty";
-        localResults.textContent="Enter a search query.";
-        return;
+  if(!query){
+    meta.textContent="";
+    results.className=
+      "empty";
+
+    results.textContent=
+      "Enter a search query.";
+
+    return;
+  }
+
+  const calculation=
+    calculate(query);
+
+  if(calculation!==null){
+    showCalculator(
+      calculation
+    );
+  }
+
+  /*
+   * TraceBreak is intentionally
+   * independent from external APIs.
+   */
+  try{
+    const data=
+      await localSearch();
+
+    showCorrection(data);
+
+    const items=
+      Array.isArray(data.results)?
+      data.results:
+      [];
+
+    results.textContent="";
+
+    const count=
+      addResults(items);
+
+    meta.textContent=
+      count+
+      (count===1?
+        " result":
+        " results");
+
+    if(!count){
+      results.className=
+        "empty";
+
+      results.textContent=
+        "TraceBreak hasn't indexed anything matching that query yet.";
     }
 
-    /*
-     * Local search is deliberately awaited alone.
-     * External providers never block it.
-     */
-    try{
-        const data=await tracebreak();
+  }catch(error){
+    console.error(error);
 
-        const items=Array.isArray(data.results)
-            ?data.results:[];
+    meta.textContent=
+      "TraceBreak is temporarily unavailable.";
+  }
 
-        showCorrection(data);
+  /*
+   * External sources start only after
+   * the local index has rendered.
+   */
+  Promise.allSettled([
+    externalSearch("you"),
+    externalSearch("360")
+  ]).then(all=>{
+    for(const result of all){
+      if(result.status!=="fulfilled"){
+        continue;
+      }
 
-        localResults.textContent="";
+      const providers=
+        result.value?.providers;
 
-        if(items.length){
-            meta.textContent=
-                items.length+
-                " TraceBreak results";
+      if(!providers){
+        continue;
+      }
 
-            renderResults(
-                items,
-                localResults
-            );
-        }else{
-            meta.textContent="No indexed results";
-            localResults.className="empty";
-            localResults.textContent=
-                "TraceBreak hasn't indexed anything matching that query yet.";
-        }
-    }catch(error){
-        console.error(error);
-        meta.textContent="TraceBreak is temporarily unavailable.";
+      const you=
+        providers.you?.results;
+
+      const threeSixty=
+        providers["360"]?.results;
+
+      addResults(you);
+      addResults(threeSixty);
     }
 
-    /*
-     * These start after local results have already rendered.
-     * Each provider is independent.
-     */
-    const youBox=document.createElement("section");
-    const threeSixtyBox=document.createElement("section");
+    const count=
+      document.querySelectorAll(
+        ".result"
+      ).length;
 
-    externalResults.appendChild(youBox);
-    externalResults.appendChild(threeSixtyBox);
+    if(count){
+      meta.textContent=
+        count+
+        (count===1?
+          " result":
+          " results");
+    }
+  });
 
-    youBox.appendChild(providerHeader("You"));
-
-    const youStatus=providerStatus(
-        "You",
-        "searching..."
-    );
-
-    youBox.appendChild(youStatus);
-
-    provider("you")
-        .then(data=>{
-            youStatus.remove();
-
-            const items=
-                data?.providers?.you?.results||[];
-
-            if(items.length){
-                renderResults(
-                    items,
-                    youBox
-                );
-            }else{
-                youBox.appendChild(
-                    providerStatus(
-                        "You",
-                        "no results"
-                    )
-                );
-            }
-        })
-        .catch(error=>{
-            console.error(error);
-            youStatus.textContent=
-                "You · unavailable";
-        });
-
-    threeSixtyBox.appendChild(
-        providerHeader("360 Search")
-    );
-
-    const threeSixtyStatus=
-        providerStatus(
-            "360 Search",
-            "searching..."
-        );
-
-    threeSixtyBox.appendChild(
-        threeSixtyStatus
-    );
-
-    provider("360")
-        .then(data=>{
-            threeSixtyStatus.remove();
-
-            const items=
-                data?.providers?.["360"]?.results||[];
-
-            if(items.length){
-                renderResults(
-                    items,
-                    threeSixtyBox
-                );
-            }else{
-                threeSixtyBox.appendChild(
-                    providerStatus(
-                        "360 Search",
-                        "no results"
-                    )
-                );
-            }
-        })
-        .catch(error=>{
-            console.error(error);
-            threeSixtyStatus.textContent=
-                "360 Search · unavailable";
-        });
-
-    /*
-     * Knowledge is independent too.
-     */
-    knowledgeLookup();
+  /*
+   * Knowledge is independent and
+   * never blocks search results.
+   */
+  lookupKnowledge();
 }
 
 run();
