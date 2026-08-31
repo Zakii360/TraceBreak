@@ -83,10 +83,6 @@ header{
   cursor:pointer
 }
 
-.search button:hover{
-  background:#303030
-}
-
 .layout{
   width:min(1120px,calc(100% - 48px));
   margin:30px auto 90px;
@@ -99,26 +95,6 @@ header{
   margin-bottom:22px;
   color:#777;
   font-size:13px
-}
-
-.correction{
-  display:none;
-  margin-bottom:18px;
-  padding:10px 13px;
-  border-radius:6px;
-  background:#f5f5f5;
-  color:#555;
-  font-size:13px
-}
-
-.correction.visible{
-  display:block
-}
-
-.correction a{
-  color:#174ea6;
-  text-decoration:none;
-  font-weight:600
 }
 
 .result{
@@ -180,10 +156,58 @@ header{
   line-height:1.55
 }
 
-.empty{
-  padding:40px 0;
+.images{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px
+}
+
+.image-result{
+  overflow:hidden;
+  border:1px solid #e4e4e4;
+  border-radius:8px;
+  background:#fff;
+  transition:transform .15s ease,box-shadow .15s ease
+}
+
+.image-result:hover{
+  transform:translateY(-2px);
+  box-shadow:0 5px 18px rgba(0,0,0,.08)
+}
+
+.image-result a{
+  color:inherit;
+  text-decoration:none
+}
+
+.image-result img{
+  display:block;
+  width:100%;
+  aspect-ratio:16/10;
+  object-fit:cover;
+  background:#f2f2f2
+}
+
+.image-info{
+  padding:10px
+}
+
+.image-title{
+  overflow:hidden;
+  font-size:13px;
+  font-weight:600;
+  line-height:1.35;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.image-source{
+  overflow:hidden;
+  margin-top:4px;
   color:#777;
-  font-size:14px
+  font-size:11px;
+  text-overflow:ellipsis;
+  white-space:nowrap
 }
 
 .knowledge{
@@ -209,8 +233,7 @@ header{
 .knowledge-title{
   margin:0;
   font-size:24px;
-  line-height:1.2;
-  letter-spacing:-.6px
+  line-height:1.2
 }
 
 .knowledge-source{
@@ -243,38 +266,10 @@ header{
   text-decoration:none
 }
 
-.instant{
-  display:none;
-  margin-bottom:22px;
-  padding:16px;
-  border:1px solid #e5e5e5;
-  border-radius:8px;
-  background:#fafafa
-}
-
-.instant.visible{
-  display:block
-}
-
-.instant-label{
-  margin-bottom:7px;
+.empty{
+  padding:40px 0;
   color:#777;
-  font-size:11px;
-  font-weight:600;
-  letter-spacing:.08em;
-  text-transform:uppercase
-}
-
-.instant-value{
-  font-size:28px;
-  font-weight:600;
-  letter-spacing:-.6px
-}
-
-.instant-sub{
-  margin-top:5px;
-  color:#666;
-  font-size:13px
+  font-size:14px
 }
 
 @media(max-width:850px){
@@ -298,10 +293,6 @@ header{
     gap:14px
   }
 
-  .brand{
-    font-size:18px
-  }
-
   .search button{
     display:none
   }
@@ -309,6 +300,10 @@ header{
   .layout{
     width:calc(100% - 32px);
     margin-top:24px
+  }
+
+  .images{
+    grid-template-columns:repeat(2,minmax(0,1fr))
   }
 
   .result-url,
@@ -327,12 +322,7 @@ header{
 <a class="brand" href="index.html">TraceBreak</a>
 
 <form class="search" id="search-form">
-<input
-id="query"
-name="q"
-type="search"
-autocomplete="off"
-spellcheck="false">
+<input id="query" type="search" autocomplete="off" spellcheck="false">
 <button type="submit">Search</button>
 </form>
 
@@ -343,30 +333,17 @@ spellcheck="false">
 
 <section>
 
-<div class="correction" id="correction"></div>
-
-<div class="instant" id="instant">
-<div class="instant-label" id="instant-label"></div>
-<div class="instant-value" id="instant-value"></div>
-<div class="instant-sub" id="instant-sub"></div>
-</div>
-
-<div class="meta" id="meta">
-Searching...
-</div>
+<div class="meta" id="meta">Searching...</div>
 
 <div id="results"></div>
+
+<div id="images"></div>
 
 </section>
 
 <aside class="knowledge" id="knowledge">
-
-<div class="knowledge-label">
-Knowledge
-</div>
-
+<div class="knowledge-label">Knowledge</div>
 <div id="knowledge-content"></div>
-
 </aside>
 
 </main>
@@ -384,6 +361,9 @@ BASE+"tracebreak-meta";
 const INSTANT=
 BASE+"tracebreak-instant-v2";
 
+const IMAGE_SEARCH=
+BASE+"tracebreak-image-search";
+
 const params=
 new URLSearchParams(location.search);
 
@@ -399,26 +379,14 @@ document.getElementById("meta");
 const results=
 document.getElementById("results");
 
-const correction=
-document.getElementById("correction");
+const images=
+document.getElementById("images");
 
 const knowledge=
 document.getElementById("knowledge");
 
 const knowledgeContent=
 document.getElementById("knowledge-content");
-
-const instant=
-document.getElementById("instant");
-
-const instantLabel=
-document.getElementById("instant-label");
-
-const instantValue=
-document.getElementById("instant-value");
-
-const instantSub=
-document.getElementById("instant-sub");
 
 const seen=
 new Set();
@@ -427,35 +395,31 @@ input.value=
 query.replace(/\+/g," ");
 
 function encodeQuery(value){
-  let output="";
+  let out="";
 
   for(const char of value.trim()){
-    output+=
+    out+=
       char==="+"?
       "+":
       encodeURIComponent(char);
   }
 
-  return output;
-}
-
-function navigate(value){
-  value=value.trim();
-
-  if(!value){
-    return;
-  }
-
-  location.href=
-    "search.html?q="+
-    encodeQuery(value);
+  return out;
 }
 
 document
 .getElementById("search-form")
 .addEventListener("submit",event=>{
   event.preventDefault();
-  navigate(input.value);
+
+  const value=
+    input.value.trim();
+
+  if(value){
+    location.href=
+      "search.html?q="+
+      encodeQuery(value);
+  }
 });
 
 function canonical(url){
@@ -473,9 +437,7 @@ function canonical(url){
       "utm_content",
       "gclid",
       "fbclid",
-      "msclkid",
-      "dclid",
-      "yclid"
+      "msclkid"
     ].forEach(key=>{
       u.searchParams.delete(key);
     });
@@ -486,45 +448,45 @@ function canonical(url){
   }
 }
 
-function makeFavicon(url){
+function favicon(url){
   try{
-    const parsed=
+    const u=
       new URL(url);
 
-    const image=
+    const img=
       document.createElement("img");
 
-    image.className=
+    img.className=
       "favicon";
 
-    image.alt="";
+    img.alt="";
 
-    image.loading=
+    img.loading=
       "lazy";
 
-    image.src=
-      parsed.origin+
+    img.src=
+      u.origin+
       "/favicon.ico";
 
-    image.onerror=()=>{
-      image.remove();
+    img.onerror=()=>{
+      img.remove();
     };
 
-    return image;
+    return img;
   }catch{
     return null;
   }
 }
 
 function addResult(item){
-  if(!item||!item.url){
+  if(!item?.url){
     return false;
   }
 
   const key=
     canonical(item.url);
 
-  if(!key||seen.has(key)){
+  if(seen.has(key)){
     return false;
   }
 
@@ -544,30 +506,21 @@ function addResult(item){
 
   const icon=
     item.favicon?
-    (() => {
-      const image=
-        document.createElement("img");
+    document.createElement("img"):
+    favicon(item.url);
 
-      image.className=
-        "favicon";
+  if(item.favicon){
+    icon.className=
+      "favicon";
 
-      image.alt="";
+    icon.src=
+      item.favicon;
 
-      image.loading=
-        "lazy";
+    icon.alt="";
 
-      image.src=
-        item.favicon;
-
-      image.onerror=()=>{
-        image.src=
-          new URL(item.url).origin+
-          "/favicon.ico";
-      };
-
-      return image;
-    })():
-    makeFavicon(item.url);
+    icon.loading=
+      "lazy";
+  }
 
   if(icon){
     head.appendChild(icon);
@@ -622,20 +575,97 @@ function addResult(item){
   return true;
 }
 
-function addResults(items){
-  if(!Array.isArray(items)){
-    return 0;
+function addImages(items){
+  if(!Array.isArray(items)||!items.length){
+    return;
   }
 
-  let count=0;
+  const grid=
+    document.createElement("div");
+
+  grid.className=
+    "images";
 
   for(const item of items){
-    if(addResult(item)){
-      count++;
+    if(!item?.image){
+      continue;
     }
+
+    const card=
+      document.createElement("article");
+
+    card.className=
+      "image-result";
+
+    const link=
+      document.createElement("a");
+
+    link.href=
+      item.url||
+      item.image;
+
+    link.target=
+      "_blank";
+
+    link.rel=
+      "noopener noreferrer";
+
+    const image=
+      document.createElement("img");
+
+    image.src=
+      item.image;
+
+    image.alt=
+      item.title||
+      "";
+
+    image.loading=
+      "lazy";
+
+    image.onerror=()=>{
+      card.remove();
+    };
+
+    const info=
+      document.createElement("div");
+
+    info.className=
+      "image-info";
+
+    const title=
+      document.createElement("div");
+
+    title.className=
+      "image-title";
+
+    title.textContent=
+      item.title||
+      "Image";
+
+    const source=
+      document.createElement("div");
+
+    source.className=
+      "image-source";
+
+    source.textContent=
+      item.source||
+      "";
+
+    info.appendChild(title);
+    info.appendChild(source);
+
+    link.appendChild(image);
+    link.appendChild(info);
+
+    card.appendChild(link);
+    grid.appendChild(card);
   }
 
-  return count;
+  if(grid.children.length){
+    images.appendChild(grid);
+  }
 }
 
 async function localSearch(){
@@ -644,13 +674,7 @@ async function localSearch(){
       SEARCH+
       "?q="+
       encodeQuery(query)+
-      "&limit=100",
-      {
-        headers:{
-          Accept:
-            "application/json"
-        }
-      }
+      "&limit=100"
     );
 
   if(!response.ok){
@@ -666,7 +690,7 @@ async function externalSearch(provider){
   const controller=
     new AbortController();
 
-  const timeout=
+  const timer=
     setTimeout(
       ()=>controller.abort(),
       6500
@@ -684,265 +708,162 @@ async function externalSearch(provider){
         provider,
         {
           signal:
-            controller.signal,
-          headers:{
-            Accept:
-              "application/json"
-          }
+            controller.signal
         }
       );
 
     if(!response.ok){
       throw new Error(
         provider+
-        " search failed"
+        " failed"
       );
     }
 
     return response.json();
-
   }finally{
-    clearTimeout(timeout);
+    clearTimeout(timer);
   }
 }
 
-async function lookupKnowledge(){
+async function imageSearch(){
   try{
     const response=
       await fetch(
-        INSTANT+
+        IMAGE_SEARCH+
         "?q="+
-        encodeQuery(query),
-        {
-          headers:{
-            Accept:
-              "application/json"
-          }
-        }
+        encodeQuery(query)+
+        "&limit=30"
       );
 
-    if(response.ok){
-      showKnowledge(
-        await response.json()
-      );
+    if(!response.ok){
+      return;
     }
+
+    const data=
+      await response.json();
+
+    addImages(
+      data.results
+    );
+
   }catch(error){
     console.error(error);
   }
 }
 
-function showKnowledge(data){
-  const wiki=
-    data?.wikipedia;
-
-  const ddg=
-    data?.duckduckgo;
-
-  const item=
-    wiki?.title?
-    wiki:
-    ddg;
-
-  if(
-    !item?.title&&
-    !item?.description
-  ){
-    return;
-  }
-
-  knowledgeContent.textContent=
-    "";
-
-  const title=
-    document.createElement("h2");
-
-  title.className=
-    "knowledge-title";
-
-  title.textContent=
-    item.title||
-    query;
-
-  const source=
-    document.createElement("div");
-
-  source.className=
-    "knowledge-source";
-
-  source.textContent=
-    wiki?.title?
-    "Wikipedia":
-    "DuckDuckGo";
-
-  knowledgeContent.appendChild(title);
-  knowledgeContent.appendChild(source);
-
-  if(item.image){
-    const image=
-      document.createElement("img");
-
-    image.className=
-      "knowledge-image";
-
-    image.src=
-      item.image;
-
-    image.alt="";
-
-    image.loading=
-      "lazy";
-
-    image.onerror=()=>{
-      image.remove();
-    };
-
-    knowledgeContent.appendChild(image);
-  }
-
-  if(item.description){
-    const description=
-      document.createElement("p");
-
-    description.className=
-      "knowledge-description";
-
-    description.textContent=
-      item.description;
-
-    knowledgeContent.appendChild(
-      description
-    );
-  }
-
-  if(item.url){
-    const link=
-      document.createElement("a");
-
-    link.className=
-      "knowledge-link";
-
-    link.href=
-      item.url;
-
-    link.target=
-      "_blank";
-
-    link.rel=
-      "noopener noreferrer";
-
-    link.textContent=
-      "Source";
-
-    knowledgeContent.appendChild(link);
-  }
-
-  knowledge.classList.add(
-    "visible"
-  );
-}
-
-function calculate(value){
-  let expression=
-    value
-      .replace(/,/g,"")
-      .replace(/\^/g,"**")
-      .replace(/\bpi\b/gi,"Math.PI")
-      .replace(/\be\b/g,"Math.E")
-      .replace(/\bsqrt\s*\(/gi,"Math.sqrt(")
-      .replace(/\bsin\s*\(/gi,"Math.sin(")
-      .replace(/\bcos\s*\(/gi,"Math.cos(")
-      .replace(/\btan\s*\(/gi,"Math.tan(")
-      .replace(/\blog\s*\(/gi,"Math.log10(")
-      .replace(/\bln\s*\(/gi,"Math.log(");
-
-  if(
-    !/^[0-9+\-*/().%\s_a-zA-Z*]+$/.test(
-      expression
-    )
-  ){
-    return null;
-  }
-
-  if(
-    /constructor|prototype|window|document|globalThis|Function|eval|import|fetch/i.test(
-      expression
-    )
-  ){
-    return null;
-  }
-
+async function showKnowledge(){
   try{
-    const result=
-      Function(
-        "\"use strict\";return("+
-        expression+
-        ")"
-      )();
+    const response=
+      await fetch(
+        INSTANT+
+        "?q="+
+        encodeQuery(query)
+      );
 
-    if(
-      typeof result!=="number"||
-      !Number.isFinite(result)
-    ){
-      return null;
+    if(!response.ok){
+      return;
     }
 
-    return result;
-  }catch{
-    return null;
-  }
-}
+    const data=
+      await response.json();
 
-function showCalculator(value){
-  instantLabel.textContent=
-    "Calculator";
+    const item=
+      data.wikipedia?.title?
+      data.wikipedia:
+      data.duckduckgo;
 
-  instantValue.textContent=
-    Number.isInteger(value)?
-    String(value):
-    String(
-      Number(
-        value.toPrecision(12)
-      )
+    if(!item?.title&&!item?.description){
+      return;
+    }
+
+    knowledgeContent.textContent="";
+
+    const title=
+      document.createElement("h2");
+
+    title.className=
+      "knowledge-title";
+
+    title.textContent=
+      item.title||
+      query;
+
+    const source=
+      document.createElement("div");
+
+    source.className=
+      "knowledge-source";
+
+    source.textContent=
+      data.wikipedia?.title?
+      "Wikipedia":
+      "DuckDuckGo";
+
+    knowledgeContent.appendChild(title);
+    knowledgeContent.appendChild(source);
+
+    if(item.image){
+      const image=
+        document.createElement("img");
+
+      image.className=
+        "knowledge-image";
+
+      image.src=
+        item.image;
+
+      image.alt="";
+
+      image.loading=
+        "lazy";
+
+      knowledgeContent.appendChild(image);
+    }
+
+    if(item.description){
+      const description=
+        document.createElement("p");
+
+      description.className=
+        "knowledge-description";
+
+      description.textContent=
+        item.description;
+
+      knowledgeContent.appendChild(
+        description
+      );
+    }
+
+    if(item.url){
+      const link=
+        document.createElement("a");
+
+      link.className=
+        "knowledge-link";
+
+      link.href=
+        item.url;
+
+      link.target=
+        "_blank";
+
+      link.rel=
+        "noopener noreferrer";
+
+      link.textContent=
+        "Source";
+
+      knowledgeContent.appendChild(link);
+    }
+
+    knowledge.classList.add(
+      "visible"
     );
 
-  instantSub.textContent=
-    query;
-
-  instant.classList.add(
-    "visible"
-  );
-}
-
-function showCorrection(data){
-  const corrected=
-    data?.corrected_query;
-
-  if(
-    !corrected||
-    corrected.toLowerCase()===
-    query.toLowerCase()
-  ){
-    return;
+  }catch(error){
+    console.error(error);
   }
-
-  correction.textContent=
-    "Showing results for ";
-
-  const link=
-    document.createElement("a");
-
-  link.href=
-    "search.html?q="+
-    encodeQuery(corrected);
-
-  link.textContent=
-    corrected;
-
-  correction.appendChild(link);
-
-  correction.classList.add(
-    "visible"
-  );
 }
 
 async function run(){
@@ -957,48 +878,25 @@ async function run(){
     return;
   }
 
-  const calculation=
-    calculate(query);
-
-  if(calculation!==null){
-    showCalculator(
-      calculation
-    );
-  }
-
   /*
-   * TraceBreak is intentionally
-   * independent from external APIs.
+   * Local TraceBreak results first.
    */
   try{
     const data=
       await localSearch();
 
-    showCorrection(data);
-
-    const items=
-      Array.isArray(data.results)?
-      data.results:
-      [];
-
-    results.textContent="";
-
     const count=
-      addResults(items);
+      Array.isArray(data.results)?
+      data.results.filter(
+        addResult
+      ).length:
+      0;
 
     meta.textContent=
       count+
       (count===1?
         " result":
         " results");
-
-    if(!count){
-      results.className=
-        "empty";
-
-      results.textContent=
-        "TraceBreak hasn't indexed anything matching that query yet.";
-    }
 
   }catch(error){
     console.error(error);
@@ -1008,33 +906,32 @@ async function run(){
   }
 
   /*
-   * External sources start only after
-   * the local index has rendered.
+   * External sources never block
+   * local search.
    */
   Promise.allSettled([
     externalSearch("you"),
     externalSearch("360")
-  ]).then(all=>{
-    for(const result of all){
-      if(result.status!=="fulfilled"){
+  ]).then(items=>{
+    for(const item of items){
+      if(item.status!=="fulfilled"){
         continue;
       }
 
       const providers=
-        result.value?.providers;
+        item.value?.providers;
 
       if(!providers){
         continue;
       }
 
-      const you=
-        providers.you?.results;
+      addResults(
+        providers.you?.results
+      );
 
-      const threeSixty=
-        providers["360"]?.results;
-
-      addResults(you);
-      addResults(threeSixty);
+      addResults(
+        providers["360"]?.results
+      );
     }
 
     const count=
@@ -1052,10 +949,24 @@ async function run(){
   });
 
   /*
-   * Knowledge is independent and
-   * never blocks search results.
+   * Image search is independent.
    */
-  lookupKnowledge();
+  imageSearch();
+
+  /*
+   * Knowledge panel is independent.
+   */
+  showKnowledge();
+}
+
+function addResults(items){
+  if(!Array.isArray(items)){
+    return;
+  }
+
+  for(const item of items){
+    addResult(item);
+  }
 }
 
 run();
