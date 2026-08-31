@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TraceBreak Search</title>
+  <meta name="description" content="Trace the web, not the user.">
+
   <style>
     :root {
       color-scheme: light;
@@ -18,23 +20,25 @@
 
     body {
       margin: 0;
+      background: #fff;
     }
 
     header {
       position: sticky;
       top: 0;
-      padding: 16px 24px;
-      border-bottom: 1px solid #e7e7e7;
+      z-index: 10;
+      padding: 15px 24px;
+      border-bottom: 1px solid #e8e8e8;
       background: #fffffff2;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(9px);
     }
 
     .top {
-      width: min(1040px, 100%);
+      width: min(1080px, 100%);
       margin: auto;
       display: flex;
       align-items: center;
-      gap: 24px;
+      gap: 25px;
     }
 
     .brand {
@@ -46,32 +50,33 @@
       white-space: nowrap;
     }
 
-    form {
+    .search {
+      width: min(720px, 100%);
       display: flex;
-      flex: 1;
-      max-width: 720px;
       gap: 8px;
     }
 
-    input {
+    .search input {
       flex: 1;
       min-width: 0;
       height: 42px;
-      padding: 0 13px;
+      padding: 0 14px;
       border: 1px solid #cfcfcf;
       border-radius: 6px;
       outline: none;
+      background: #fff;
+      color: #171717;
       font-size: 15px;
     }
 
-    input:focus {
+    .search input:focus {
       border-color: #777;
       box-shadow: 0 0 0 3px #0000000c;
     }
 
-    button {
+    .search button {
       height: 42px;
-      padding: 0 17px;
+      padding: 0 18px;
       border: 0;
       border-radius: 6px;
       background: #171717;
@@ -79,33 +84,57 @@
       cursor: pointer;
     }
 
-    .page {
-      width: min(900px, calc(100% - 48px));
-      margin: 30px auto 80px;
+    .search button:hover {
+      background: #303030;
     }
 
-    .count {
+    .layout {
+      width: min(1080px, calc(100% - 48px));
+      margin: 30px auto 80px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 290px;
+      gap: 55px;
+    }
+
+    .meta {
       margin-bottom: 24px;
       color: #777;
       font-size: 13px;
     }
 
     .result {
-      margin-bottom: 29px;
+      margin-bottom: 30px;
     }
 
-    .result a {
+    .result-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .favicon {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      border-radius: 4px;
+      object-fit: contain;
+      flex: 0 0 20px;
+    }
+
+    .result-title {
+      display: block;
       color: #174ea6;
       text-decoration: none;
       font-size: 19px;
+      line-height: 1.25;
     }
 
-    .result a:hover {
+    .result-title:hover {
       text-decoration: underline;
     }
 
-    .url {
-      margin: 5px 0;
+    .result-url {
+      margin: 5px 0 4px;
       overflow: hidden;
       color: #28743b;
       font-size: 13px;
@@ -115,60 +144,130 @@
 
     .description {
       max-width: 760px;
-      margin: 0;
+      margin: 0 0 0 30px;
       color: #4c4c4c;
       font-size: 14px;
       line-height: 1.5;
     }
 
     .empty {
-      padding: 50px 0;
+      padding: 45px 0;
       color: #777;
+      font-size: 14px;
     }
 
-    .loading {
-      padding: 15px 0;
+    .knowledge {
+      display: none;
+      border-left: 1px solid #e5e5e5;
+      padding-left: 24px;
+    }
+
+    .knowledge.show {
+      display: block;
+    }
+
+    .knowledge h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+    }
+
+    .knowledge-source {
+      margin-bottom: 16px;
       color: #777;
+      font-size: 12px;
+    }
+
+    .knowledge-image {
+      width: 100%;
+      max-height: 180px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    .knowledge-description {
+      margin: 0;
+      color: #444;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .knowledge-link {
+      display: inline-block;
+      margin-top: 13px;
+      color: #174ea6;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .knowledge-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: 1fr;
+        gap: 25px;
+      }
+
+      .knowledge {
+        border-top: 1px solid #e5e5e5;
+        border-left: 0;
+        padding: 25px 0 0;
+      }
     }
 
     @media (max-width: 600px) {
       header {
-        padding: 14px 16px;
+        padding: 13px 16px;
       }
 
       .top {
-        gap: 12px;
+        gap: 13px;
       }
 
       .brand {
         font-size: 18px;
       }
 
-      .page {
-        width: calc(100% - 32px);
+      .search button {
+        display: none;
       }
 
-      button {
-        display: none;
+      .layout {
+        width: calc(100% - 32px);
+        margin-top: 24px;
+      }
+
+      .description {
+        margin-left: 0;
       }
     }
   </style>
 </head>
+
 <body>
   <header>
     <div class="top">
       <a class="brand" href="index.html">TraceBreak</a>
 
-      <form id="search">
+      <form class="search" id="search">
         <input id="query" name="q" type="search" autocomplete="off">
         <button type="submit">Search</button>
       </form>
     </div>
   </header>
 
-  <main class="page">
-    <div id="count" class="count"></div>
-    <div id="results" class="loading">Searching...</div>
+  <main class="layout">
+    <section>
+      <div class="meta" id="meta">Searching...</div>
+      <div id="results"></div>
+    </section>
+
+    <aside class="knowledge" id="knowledge">
+      <div id="knowledge-content"></div>
+    </aside>
   </main>
 
   <script>
@@ -179,50 +278,137 @@
 
     const input = document.getElementById("query");
     const results = document.getElementById("results");
-    const count = document.getElementById("count");
+    const meta = document.getElementById("meta");
+    const knowledge = document.getElementById("knowledge");
+    const knowledgeContent = document.getElementById("knowledge-content");
 
     input.value = query;
 
-    function cleanQuery(value) {
+    function queryText(value) {
       return value.trim().split(/\s+/).join("+");
     }
 
-    document.getElementById("search").addEventListener("submit", event => {
-      event.preventDefault();
-
-      const value = input.value.trim();
+    function go(value) {
+      value = value.trim();
 
       if (!value) {
         return;
       }
 
-      location.href = "search.html?q=" + cleanQuery(value);
+      location.href = "search.html?q=" + queryText(value);
+    }
+
+    document.getElementById("search").addEventListener("submit", event => {
+      event.preventDefault();
+      go(input.value);
     });
+
+    function favicon(url) {
+      try {
+        const host = new URL(url).hostname;
+
+        const image = document.createElement("img");
+        image.className = "favicon";
+        image.src = "https://www.google.com/s2/favicons?domain=" + host + "&sz=32";
+        image.alt = "";
+        image.loading = "lazy";
+
+        image.onerror = () => {
+          image.remove();
+        };
+
+        return image;
+      } catch {
+        return null;
+      }
+    }
 
     function addResult(item) {
       const article = document.createElement("article");
       article.className = "result";
 
-      const link = document.createElement("a");
-      link.href = item.url;
-      link.target = "_blank";
-      link.rel = "noopener";
-      link.textContent = item.title || item.url;
+      const head = document.createElement("div");
+      head.className = "result-head";
+
+      const icon = favicon(item.url);
+
+      if (icon) {
+        head.appendChild(icon);
+      }
+
+      const title = document.createElement("a");
+      title.className = "result-title";
+      title.href = item.url;
+      title.target = "_blank";
+      title.rel = "noopener";
+      title.textContent = item.title || item.url;
+
+      head.appendChild(title);
 
       const url = document.createElement("div");
-      url.className = "url";
+      url.className = "result-url";
       url.textContent = item.url;
 
       const description = document.createElement("p");
       description.className = "description";
-      description.textContent = item.description || "No description available.";
+      description.textContent =
+        item.description ||
+        "No description available.";
 
-      article.append(link, url, description);
+      article.append(head, url, description);
       results.appendChild(article);
+    }
+
+    function showKnowledge(data) {
+      const panel = data.knowledge;
+
+      if (!panel || !panel.title) {
+        return;
+      }
+
+      knowledgeContent.textContent = "";
+
+      const title = document.createElement("h2");
+      title.textContent = panel.title;
+
+      const source = document.createElement("div");
+      source.className = "knowledge-source";
+      source.textContent = panel.source || "Knowledge";
+
+      knowledgeContent.append(title, source);
+
+      if (panel.image_url) {
+        const image = document.createElement("img");
+        image.className = "knowledge-image";
+        image.src = panel.image_url;
+        image.alt = "";
+        image.loading = "lazy";
+        knowledgeContent.appendChild(image);
+      }
+
+      if (panel.description) {
+        const description = document.createElement("p");
+        description.className = "knowledge-description";
+        description.textContent = panel.description;
+        knowledgeContent.appendChild(description);
+      }
+
+      if (panel.source_url) {
+        const link = document.createElement("a");
+        link.className = "knowledge-link";
+        link.href = panel.source_url;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = "Read more";
+        knowledgeContent.appendChild(link);
+      }
+
+      knowledge.classList.add("show");
     }
 
     async function search() {
       if (!query.trim()) {
+        meta.textContent = "";
         results.className = "empty";
         results.textContent = "Enter a search query.";
         return;
@@ -230,7 +416,7 @@
 
       try {
         const response = await fetch(
-          API + "?q=" + cleanQuery(query) + "&limit=20"
+          API + "?q=" + queryText(query) + "&limit=20"
         );
 
         if (!response.ok) {
@@ -242,18 +428,21 @@
         results.textContent = "";
         results.className = "";
 
-        if (!data.results || !data.results.length) {
-          count.textContent = "No results";
+        const list = data.results || [];
+
+        if (!list.length) {
+          meta.textContent = "No results";
           results.className = "empty";
           results.textContent = "Nothing matched that query.";
           return;
         }
 
-        count.textContent = data.results.length + " results";
+        meta.textContent = list.length + " results";
 
-        data.results.forEach(addResult);
+        list.forEach(addResult);
+        showKnowledge(data);
       } catch {
-        count.textContent = "";
+        meta.textContent = "";
         results.className = "empty";
         results.textContent = "Search is temporarily unavailable.";
       }
