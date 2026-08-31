@@ -1,1163 +1,464 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>TraceBreak</title>
-  <meta name="description" content="Trace the web, not the user.">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TraceBreak</title>
+<meta name="description" content="Trace the web, not the user.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 
-  <style>
-    :root {
-      font-family: Arial, Helvetica, sans-serif;
-      color: #171717;
-      background: #fff;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: #fff;
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      padding: 14px 24px;
-      border-bottom: 1px solid #e7e7e7;
-      background: rgba(255,255,255,.94);
-      backdrop-filter: blur(10px);
-    }
-
-    .top {
-      width: min(1120px,100%);
-      margin: auto;
-      display: flex;
-      align-items: center;
-      gap: 25px;
-    }
-
-    .brand {
-      color: #171717;
-      text-decoration: none;
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -1px;
-      white-space: nowrap;
-    }
-
-    .search {
-      width: min(760px,100%);
-      display: flex;
-      gap: 8px;
-    }
-
-    .search input {
-      width: 100%;
-      height: 42px;
-      padding: 0 14px;
-      border: 1px solid #cfcfcf;
-      border-radius: 7px;
-      outline: 0;
-      background: #fff;
-      color: #171717;
-      font-size: 15px;
-    }
-
-    .search input:focus {
-      border-color: #777;
-      box-shadow: 0 0 0 3px rgba(0,0,0,.05);
-    }
-
-    .search button {
-      height: 42px;
-      padding: 0 18px;
-      border: 0;
-      border-radius: 7px;
-      background: #171717;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    .search button:hover {
-      background: #303030;
-    }
-
-    .layout {
-      width: min(1120px,calc(100% - 48px));
-      margin: 30px auto 90px;
-      display: grid;
-      grid-template-columns: minmax(0,1fr) 310px;
-      gap: 55px;
-    }
-
-    .correction {
-      display: none;
-      margin: 0 0 20px;
-      padding: 10px 13px;
-      border-radius: 6px;
-      background: #f5f5f5;
-      color: #555;
-      font-size: 13px;
-    }
-
-    .correction.visible {
-      display: block;
-    }
-
-    .correction a {
-      color: #174ea6;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .correction a:hover {
-      text-decoration: underline;
-    }
-
-    .meta {
-      margin-bottom: 25px;
-      color: #777;
-      font-size: 13px;
-    }
-
-    .result {
-      margin-bottom: 30px;
-    }
-
-    .result-head {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    .favicon {
-      width: 20px;
-      height: 20px;
-      margin-top: 2px;
-      flex: 0 0 20px;
-      border-radius: 4px;
-      object-fit: contain;
-    }
-
-    .result-title {
-      color: #174ea6;
-      font-size: 19px;
-      line-height: 1.3;
-      text-decoration: none;
-    }
-
-    .result-title:hover {
-      text-decoration: underline;
-    }
-
-    .result-url {
-      margin: 5px 0 4px 30px;
-      overflow: hidden;
-      color: #28743b;
-      font-size: 13px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .description {
-      max-width: 760px;
-      margin: 0 0 0 30px;
-      color: #4b4b4b;
-      font-size: 14px;
-      line-height: 1.55;
-    }
-
-    .empty {
-      padding: 45px 0;
-      color: #777;
-      font-size: 14px;
-    }
-
-    .knowledge {
-      display: none;
-      align-self: start;
-      border-left: 1px solid #e5e5e5;
-      padding-left: 24px;
-    }
-
-    .knowledge.visible {
-      display: block;
-    }
-
-    .knowledge-label {
-      margin-bottom: 15px;
-      color: #777;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-    }
-
-    .knowledge-title {
-      margin: 0;
-      font-size: 24px;
-      line-height: 1.2;
-      letter-spacing: -.6px;
-    }
-
-    .knowledge-source {
-      margin: 6px 0 16px;
-      color: #777;
-      font-size: 12px;
-    }
-
-    .knowledge-image {
-      display: block;
-      width: 100%;
-      max-height: 190px;
-      margin-bottom: 15px;
-      border-radius: 7px;
-      object-fit: cover;
-    }
-
-    .knowledge-description {
-      margin: 0;
-      color: #444;
-      font-size: 14px;
-      line-height: 1.55;
-    }
-
-    .knowledge-link {
-      display: inline-block;
-      margin-top: 13px;
-      color: #174ea6;
-      font-size: 13px;
-      text-decoration: none;
-    }
-
-    .knowledge-link:hover {
-      text-decoration: underline;
-    }
-
-    .knowledge-block {
-      margin-top: 23px;
-      padding-top: 19px;
-      border-top: 1px solid #e7e7e7;
-    }
-
-    .knowledge-block h3 {
-      margin: 0 0 8px;
-      font-size: 14px;
-    }
-
-    .knowledge-block p {
-      margin: 0;
-      color: #555;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .instant {
-      display: none;
-      margin-bottom: 25px;
-      padding: 18px;
-      border: 1px solid #e5e5e5;
-      border-radius: 8px;
-      background: #fafafa;
-    }
-
-    .instant.visible {
-      display: block;
-    }
-
-    .instant-label {
-      margin-bottom: 8px;
-      color: #777;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-
-    .instant-value {
-      font-size: 28px;
-      font-weight: 600;
-      letter-spacing: -.7px;
-    }
-
-    .instant-sub {
-      margin-top: 6px;
-      color: #666;
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    @media (max-width:850px) {
-      .layout {
-        grid-template-columns: 1fr;
-        gap: 25px;
-      }
-
-      .knowledge {
-        border-top: 1px solid #e5e5e5;
-        border-left: 0;
-        padding: 25px 0 0;
-      }
-    }
-
-    @media (max-width:600px) {
-      header {
-        padding: 13px 16px;
-      }
-
-      .top {
-        gap: 14px;
-      }
-
-      .brand {
-        font-size: 18px;
-      }
-
-      .search button {
-        display: none;
-      }
-
-      .layout {
-        width: calc(100% - 32px);
-        margin-top: 24px;
-      }
-
-      .result-url,
-      .description {
-        margin-left: 0;
-      }
-    }
-  </style>
+<style>
+:root{font-family:Arial,Helvetica,sans-serif;color:#171717;background:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:#fff}
+header{position:sticky;top:0;z-index:10;padding:14px 24px;border-bottom:1px solid #e7e7e7;background:rgba(255,255,255,.95);backdrop-filter:blur(10px)}
+.top{width:min(1120px,100%);margin:auto;display:flex;align-items:center;gap:24px}
+.brand{color:#171717;text-decoration:none;font-size:20px;font-weight:700;letter-spacing:-1px}
+.search{display:flex;width:min(760px,100%);gap:8px}
+.search input{width:100%;height:42px;padding:0 14px;border:1px solid #ccc;border-radius:7px;outline:0;font-size:15px}
+.search input:focus{border-color:#777;box-shadow:0 0 0 3px rgba(0,0,0,.05)}
+.search button{height:42px;padding:0 18px;border:0;border-radius:7px;background:#171717;color:white;cursor:pointer}
+.layout{width:min(1120px,calc(100% - 48px));margin:30px auto 80px;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:50px}
+.meta{margin-bottom:22px;color:#777;font-size:13px}
+.correction{display:none;margin-bottom:18px;padding:10px 13px;border-radius:6px;background:#f5f5f5;color:#555;font-size:13px}
+.correction.visible{display:block}
+.correction a{color:#174ea6;text-decoration:none;font-weight:600}
+.result{margin-bottom:30px}
+.result-head{display:flex;align-items:flex-start;gap:9px}
+.favicon{width:20px;height:20px;margin-top:2px;object-fit:contain;border-radius:4px}
+.result-title{color:#174ea6;font-size:19px;line-height:1.3;text-decoration:none}
+.result-title:hover{text-decoration:underline}
+.result-url{margin:5px 0 4px 29px;color:#28743b;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.description{margin:0 0 0 29px;max-width:760px;color:#4b4b4b;font-size:14px;line-height:1.55}
+.provider{margin:34px 0 18px;padding-bottom:9px;border-bottom:1px solid #e5e5e5;color:#777;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.external-status{margin:-7px 0 20px;color:#999;font-size:12px}
+.empty{padding:40px 0;color:#777;font-size:14px}
+.knowledge{display:none;border-left:1px solid #e5e5e5;padding-left:24px}
+.knowledge.visible{display:block}
+.knowledge-label{margin-bottom:15px;color:#777;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.knowledge-title{margin:0;font-size:24px;line-height:1.2}
+.knowledge-source{margin:6px 0 15px;color:#777;font-size:12px}
+.knowledge-image{width:100%;max-height:190px;object-fit:cover;border-radius:7px;margin-bottom:14px}
+.knowledge-description{margin:0;color:#444;font-size:14px;line-height:1.55}
+.knowledge-link{display:inline-block;margin-top:13px;color:#174ea6;font-size:13px;text-decoration:none}
+.knowledge-link:hover{text-decoration:underline}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.knowledge{border-left:0;border-top:1px solid #e5e5e5;padding:25px 0 0}}
+@media(max-width:600px){header{padding:13px 16px}.top{gap:14px}.search button{display:none}.layout{width:calc(100% - 32px);margin-top:24px}.result-url,.description{margin-left:0}}
+</style>
 </head>
 
 <body>
-  <header>
-    <div class="top">
-      <a class="brand" href="index.html">TraceBreak</a>
 
-      <form class="search" id="search-form">
-        <input
-          id="query"
-          name="q"
-          type="search"
-          autocomplete="off"
-          spellcheck="false"
-        >
-        <button type="submit">Search</button>
-      </form>
-    </div>
-  </header>
+<header>
+<div class="top">
+<a class="brand" href="index.html">TraceBreak</a>
+<form class="search" id="search-form">
+<input id="query" name="q" type="search" autocomplete="off" spellcheck="false">
+<button>Search</button>
+</form>
+</div>
+</header>
 
-  <main class="layout">
-    <section>
-      <div class="correction" id="correction"></div>
+<main class="layout">
 
-      <div class="instant" id="instant">
-        <div class="instant-label" id="instant-label"></div>
-        <div class="instant-value" id="instant-value"></div>
-        <div class="instant-sub" id="instant-sub"></div>
-      </div>
+<section>
+<div class="correction" id="correction"></div>
+<div class="meta" id="meta">Searching TraceBreak...</div>
 
-      <div class="meta" id="meta">Searching...</div>
-      <div id="results"></div>
-    </section>
+<div id="local-results"></div>
 
-    <aside class="knowledge" id="knowledge">
-      <div class="knowledge-label">Knowledge</div>
-      <div id="knowledge-content"></div>
-    </aside>
-  </main>
+<div id="external-results"></div>
+</section>
 
-  <script>
-    const SUPABASE_SEARCH =
-      "https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/tracebreak-search-v2";
+<aside class="knowledge" id="knowledge">
+<div class="knowledge-label">Knowledge</div>
+<div id="knowledge-content"></div>
+</aside>
 
-    const SUPABASE_INSTANT =
-      "https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/tracebreak-instant-v2";
+</main>
 
-    const params =
-      new URLSearchParams(location.search);
+<script>
+const BASE="https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/";
 
-    const rawQuery =
-      params.get("q") || "";
+const SEARCH=BASE+"tracebreak-search-v2";
+const META=BASE+"tracebreak-meta";
+const INSTANT=BASE+"tracebreak-instant-v2";
 
-    const query =
-      rawQuery.trim();
+const params=new URLSearchParams(location.search);
+const query=(params.get("q")||"").trim();
 
-    const input =
-      document.getElementById("query");
+const input=document.getElementById("query");
+const meta=document.getElementById("meta");
+const localResults=document.getElementById("local-results");
+const externalResults=document.getElementById("external-results");
+const correction=document.getElementById("correction");
+const knowledge=document.getElementById("knowledge");
+const knowledgeContent=document.getElementById("knowledge-content");
 
-    const meta =
-      document.getElementById("meta");
+input.value=query.replace(/\+/g," ");
 
-    const results =
-      document.getElementById("results");
-
-    const knowledge =
-      document.getElementById("knowledge");
-
-    const knowledgeContent =
-      document.getElementById(
-        "knowledge-content"
-      );
-
-    const correction =
-      document.getElementById(
-        "correction"
-      );
-
-    const instant =
-      document.getElementById(
-        "instant"
-      );
-
-    const instantLabel =
-      document.getElementById(
-        "instant-label"
-      );
-
-    const instantValue =
-      document.getElementById(
-        "instant-value"
-      );
-
-    const instantSub =
-      document.getElementById(
-        "instant-sub"
-      );
-
-    input.value =
-      query.replace(/\+/g, " ");
-
-    function encodeSearchQuery(value) {
-      const trimmed =
-        value.trim();
-
-      let output = "";
-
-      for (const char of trimmed) {
-        if (char === "+") {
-          output += "+";
-        } else {
-          output +=
-            encodeURIComponent(char);
-        }
-      }
-
-      return output;
+function encodeQuery(value){
+    let out="";
+    for(const char of value.trim()){
+        out+=char==="+"?"+":encodeURIComponent(char);
     }
+    return out;
+}
 
-    function navigate(value) {
-      value = value.trim();
+function search(value){
+    value=value.trim();
+    if(!value)return;
+    location.href="search.html?q="+encodeQuery(value);
+}
 
-      if (!value) {
-        return;
-      }
+document.getElementById("search-form").addEventListener("submit",e=>{
+    e.preventDefault();
+    search(input.value);
+});
 
-      location.href =
-        "search.html?q=" +
-        encodeSearchQuery(value);
-    }
-
-    document
-      .getElementById("search-form")
-      .addEventListener(
-        "submit",
-        event => {
-          event.preventDefault();
-          navigate(input.value);
-        }
-      );
-
-    function showCorrection(
-      original,
-      corrected
-    ) {
-      if (
-        !corrected ||
-        corrected.toLowerCase() ===
-          original.toLowerCase()
-      ) {
-        return;
-      }
-
-      correction.textContent =
-        "Showing results for ";
-
-      const link =
-        document.createElement("a");
-
-      link.href =
-        "search.html?q=" +
-        encodeSearchQuery(
-          corrected
-        );
-
-      link.textContent =
-        corrected;
-
-      correction.appendChild(link);
-      correction.appendChild(
-        document.createTextNode(
-          " · Search instead for "
-        )
-      );
-
-      const originalLink =
-        document.createElement("a");
-
-      originalLink.href =
-        "search.html?q=" +
-        encodeSearchQuery(
-          original
-        );
-
-      originalLink.textContent =
-        original;
-
-      correction.appendChild(
-        originalLink
-      );
-
-      correction.classList.add(
-        "visible"
-      );
-    }
-
-    function faviconFor(url) {
-      try {
-        const parsed =
-          new URL(url);
-
-        const image =
-          document.createElement("img");
-
-        image.className =
-          "favicon";
-
-        image.alt = "";
-        image.loading = "lazy";
-
-        image.src =
-          parsed.origin +
-          "/favicon.ico";
-
-        image.onerror = () => {
-          image.remove();
-        };
-
-        return image;
-      } catch {
+function favicon(url){
+    try{
+        const u=new URL(url);
+        const img=document.createElement("img");
+        img.className="favicon";
+        img.alt="";
+        img.loading="lazy";
+        img.src=u.origin+"/favicon.ico";
+        img.onerror=()=>img.remove();
+        return img;
+    }catch{
         return null;
-      }
+    }
+}
+
+function renderResult(item){
+    if(!item||!item.url)return null;
+
+    const article=document.createElement("article");
+    article.className="result";
+
+    const head=document.createElement("div");
+    head.className="result-head";
+
+    const icon=favicon(item.url);
+    if(icon)head.appendChild(icon);
+
+    const title=document.createElement("a");
+    title.className="result-title";
+    title.href=item.url;
+    title.target="_blank";
+    title.rel="noopener noreferrer";
+    title.textContent=item.title||item.url;
+
+    head.appendChild(title);
+
+    const url=document.createElement("div");
+    url.className="result-url";
+    url.textContent=item.url;
+
+    const desc=document.createElement("p");
+    desc.className="description";
+    desc.textContent=item.description||"";
+
+    article.appendChild(head);
+    article.appendChild(url);
+    article.appendChild(desc);
+
+    return article;
+}
+
+function renderResults(items,target){
+    if(!Array.isArray(items))return 0;
+
+    let count=0;
+
+    for(const item of items.slice(0,20)){
+        const result=renderResult(item);
+        if(result){
+            target.appendChild(result);
+            count++;
+        }
     }
 
-    function renderResult(item) {
-      if (!item || !item.url) {
-        return;
-      }
+    return count;
+}
 
-      const article =
-        document.createElement(
-          "article"
-        );
+function providerHeader(name){
+    const div=document.createElement("div");
+    div.className="provider";
+    div.textContent=name;
+    return div;
+}
 
-      article.className =
-        "result";
+function providerStatus(name,text){
+    const div=document.createElement("div");
+    div.className="external-status";
+    div.textContent=name+" · "+text;
+    return div;
+}
 
-      const head =
-        document.createElement(
-          "div"
-        );
-
-      head.className =
-        "result-head";
-
-      const icon =
-        faviconFor(item.url);
-
-      if (icon) {
-        head.appendChild(icon);
-      }
-
-      const title =
-        document.createElement(
-          "a"
-        );
-
-      title.className =
-        "result-title";
-
-      title.href =
-        item.url;
-
-      title.target = "_blank";
-
-      title.rel =
-        "noopener noreferrer";
-
-      title.textContent =
-        item.title ||
-        item.url;
-
-      head.appendChild(title);
-
-      const url =
-        document.createElement(
-          "div"
-        );
-
-      url.className =
-        "result-url";
-
-      url.textContent =
-        item.url;
-
-      const description =
-        document.createElement(
-          "p"
-        );
-
-      description.className =
-        "description";
-
-      description.textContent =
-        item.description ||
-        "No description available.";
-
-      article.appendChild(head);
-      article.appendChild(url);
-      article.appendChild(
-        description
-      );
-
-      results.appendChild(article);
-    }
-
-    async function tracebreakSearch() {
-      const endpoint =
-        SUPABASE_SEARCH +
-        "?q=" +
-        encodeSearchQuery(query) +
+async function tracebreak(){
+    const url=SEARCH+
+        "?q="+encodeQuery(query)+
         "&limit=100";
 
-      const response =
-        await fetch(endpoint, {
-          headers: {
-            Accept:
-              "application/json"
-          }
+    const response=await fetch(url,{
+        headers:{Accept:"application/json"}
+    });
+
+    if(!response.ok){
+        throw new Error("TraceBreak search failed");
+    }
+
+    return response.json();
+}
+
+async function provider(name){
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),6500);
+
+    try{
+        const url=META+
+            "?q="+encodeQuery(query)+
+            "&type=web"+
+            "&limit=20"+
+            "&provider="+encodeURIComponent(name);
+
+        const response=await fetch(url,{
+            signal:controller.signal,
+            headers:{Accept:"application/json"}
         });
 
-      if (!response.ok) {
-        throw new Error(
-          "TraceBreak search failed"
-        );
-      }
-
-      return response.json();
-    }
-
-    async function instantSearch() {
-      const endpoint =
-        SUPABASE_INSTANT +
-        "?q=" +
-        encodeURIComponent(query);
-
-      const response =
-        await fetch(endpoint, {
-          headers: {
-            Accept:
-              "application/json"
-          }
-        });
-
-      if (!response.ok) {
-        throw new Error(
-          "Instant search failed"
-        );
-      }
-
-      return response.json();
-    }
-
-    function showKnowledge(data) {
-      if (!data) {
-        return;
-      }
-
-      const wiki =
-        data.wikipedia;
-
-      const ddg =
-        data.duckduckgo;
-
-      if (
-        (!wiki || !wiki.title) &&
-        (!ddg || (
-          !ddg.title &&
-          !ddg.description
-        ))
-      ) {
-        return;
-      }
-
-      knowledgeContent.textContent =
-        "";
-
-      const primary =
-        wiki && wiki.title
-          ? wiki
-          : ddg;
-
-      const title =
-        document.createElement(
-          "h2"
-        );
-
-      title.className =
-        "knowledge-title";
-
-      title.textContent =
-        primary.title ||
-        query;
-
-      const source =
-        document.createElement(
-          "div"
-        );
-
-      source.className =
-        "knowledge-source";
-
-      source.textContent =
-        wiki && wiki.title
-          ? "Wikipedia"
-          : "DuckDuckGo";
-
-      knowledgeContent.appendChild(
-        title
-      );
-
-      knowledgeContent.appendChild(
-        source
-      );
-
-      if (primary.image) {
-        const image =
-          document.createElement(
-            "img"
-          );
-
-        image.className =
-          "knowledge-image";
-
-        image.src =
-          primary.image;
-
-        image.alt = "";
-
-        image.loading = "lazy";
-
-        image.onerror = () => {
-          image.remove();
-        };
-
-        knowledgeContent.appendChild(
-          image
-        );
-      }
-
-      if (primary.description) {
-        const description =
-          document.createElement(
-            "p"
-          );
-
-        description.className =
-          "knowledge-description";
-
-        description.textContent =
-          primary.description;
-
-        knowledgeContent.appendChild(
-          description
-        );
-      }
-
-      if (primary.url) {
-        const link =
-          document.createElement(
-            "a"
-          );
-
-        link.className =
-          "knowledge-link";
-
-        link.href =
-          primary.url;
-
-        link.target = "_blank";
-
-        link.rel =
-          "noopener noreferrer";
-
-        link.textContent =
-          wiki && wiki.title
-            ? "View on Wikipedia"
-            : "Source";
-
-        knowledgeContent.appendChild(
-          link
-        );
-      }
-
-      if (
-        wiki &&
-        ddg &&
-        ddg.description
-      ) {
-        const block =
-          document.createElement(
-            "div"
-          );
-
-        block.className =
-          "knowledge-block";
-
-        const heading =
-          document.createElement(
-            "h3"
-          );
-
-        heading.textContent =
-          "DuckDuckGo";
-
-        const description =
-          document.createElement(
-            "p"
-          );
-
-        description.textContent =
-          ddg.description;
-
-        block.appendChild(heading);
-        block.appendChild(
-          description
-        );
-
-        if (ddg.url) {
-          const link =
-            document.createElement(
-              "a"
-            );
-
-          link.className =
-            "knowledge-link";
-
-          link.href =
-            ddg.url;
-
-          link.target = "_blank";
-
-          link.rel =
-            "noopener noreferrer";
-
-          link.textContent =
-            "Source";
-
-          block.appendChild(link);
+        if(!response.ok){
+            throw new Error(name+" failed");
         }
 
-        knowledgeContent.appendChild(
-          block
-        );
-      }
-
-      knowledge.classList.add(
-        "visible"
-      );
+        return await response.json();
+    }finally{
+        clearTimeout(timer);
     }
+}
 
-    function calculate(expression) {
-      let value =
-        expression
-          .trim()
-          .replace(/,/g, "")
-          .replace(/\^/g, "**")
-          .replace(
-            /\bpi\b/gi,
-            "Math.PI"
-          )
-          .replace(
-            /\be\b/g,
-            "Math.E"
-          )
-          .replace(
-            /\bsqrt\s*\(/gi,
-            "Math.sqrt("
-          )
-          .replace(
-            /\bsin\s*\(/gi,
-            "Math.sin("
-          )
-          .replace(
-            /\bcos\s*\(/gi,
-            "Math.cos("
-          )
-          .replace(
-            /\btan\s*\(/gi,
-            "Math.tan("
-          )
-          .replace(
-            /\blog\s*\(/gi,
-            "Math.log10("
-          )
-          .replace(
-            /\bln\s*\(/gi,
-            "Math.log("
-          );
+function showCorrection(data){
+    const corrected=data?.corrected_query;
 
-      if (
-        !/^[0-9+\-*/().%\s_a-zA-Z*]+$/.test(
-          value
-        )
-      ) {
-        return null;
-      }
-
-      if (
-        /constructor|prototype|window|document|globalThis|Function|eval|import|fetch/i.test(
-          value
-        )
-      ) {
-        return null;
-      }
-
-      try {
-        const result =
-          Function(
-            "\"use strict\";return(" +
-            value +
-            ")"
-          )();
-
-        if (
-          typeof result !==
-            "number" ||
-          !Number.isFinite(result)
-        ) {
-          return null;
-        }
-
-        return result;
-      } catch {
-        return null;
-      }
-    }
-
-    function showCalculator(value) {
-      instantLabel.textContent =
-        "Calculator";
-
-      instantValue.textContent =
-        Number.isInteger(value)
-          ? String(value)
-          : String(
-              Number(
-                value.toPrecision(
-                  12
-                )
-              )
-            );
-
-      instantSub.textContent =
-        query;
-
-      instant.classList.add(
-        "visible"
-      );
-    }
-
-    function showWeather(data) {
-      if (
-        !data ||
-        data.type !== "weather"
-      ) {
+    if(!corrected||
+       corrected.toLowerCase()===query.toLowerCase()){
         return;
-      }
-
-      instantLabel.textContent =
-        "Weather";
-
-      instantValue.textContent =
-        data.temperature +
-        "°F";
-
-      instantSub.textContent =
-        data.location +
-        " · " +
-        data.condition +
-        " · Feels like " +
-        data.feels_like +
-        "°F · Humidity " +
-        data.humidity +
-        "% · Wind " +
-        data.wind_mph +
-        " mph";
-
-      instant.classList.add(
-        "visible"
-      );
     }
 
-    function detectWeather() {
-      const match =
-        query.match(
-          /^weather(?:\s+in)?\s+(.+)$/i
-        );
+    correction.textContent="Showing results for ";
 
-      return match
-        ? match[1].trim()
-        : null;
+    const link=document.createElement("a");
+    link.href="search.html?q="+encodeQuery(corrected);
+    link.textContent=corrected;
+
+    correction.appendChild(link);
+    correction.classList.add("visible");
+}
+
+function showKnowledge(data){
+    const wiki=data?.wikipedia;
+    const ddg=data?.duckduckgo;
+    const item=wiki?.title?wiki:ddg;
+
+    if(!item?.title&&!item?.description)return;
+
+    knowledgeContent.textContent="";
+
+    const title=document.createElement("h2");
+    title.className="knowledge-title";
+    title.textContent=item.title||query;
+
+    const source=document.createElement("div");
+    source.className="knowledge-source";
+    source.textContent=wiki?.title?"Wikipedia":"DuckDuckGo";
+
+    knowledgeContent.appendChild(title);
+    knowledgeContent.appendChild(source);
+
+    if(item.image){
+        const image=document.createElement("img");
+        image.className="knowledge-image";
+        image.src=item.image;
+        image.alt="";
+        image.loading="lazy";
+        image.onerror=()=>image.remove();
+        knowledgeContent.appendChild(image);
     }
 
-    async function weatherSearch(
-      location
-    ) {
-      const endpoint =
-        SUPABASE_INSTANT +
-        "?type=weather&q=" +
-        encodeURIComponent(
-          location
-        );
-
-      const response =
-        await fetch(endpoint, {
-          headers: {
-            Accept:
-              "application/json"
-          }
-        });
-
-      if (!response.ok) {
-        throw new Error(
-          "Weather request failed"
-        );
-      }
-
-      return response.json();
+    if(item.description){
+        const description=document.createElement("p");
+        description.className="knowledge-description";
+        description.textContent=item.description;
+        knowledgeContent.appendChild(description);
     }
 
-    async function run() {
-      if (!query) {
-        meta.textContent = "";
-        results.className =
-          "empty";
+    if(item.url){
+        const link=document.createElement("a");
+        link.className="knowledge-link";
+        link.href=item.url;
+        link.target="_blank";
+        link.rel="noopener noreferrer";
+        link.textContent="Source";
+        knowledgeContent.appendChild(link);
+    }
 
-        results.textContent =
-          "Enter a search query.";
+    knowledge.classList.add("visible");
+}
 
-        return;
-      }
-
-      const calculation =
-        calculate(query);
-
-      if (
-        calculation !== null
-      ) {
-        showCalculator(
-          calculation
+async function knowledgeLookup(){
+    try{
+        const response=await fetch(
+            INSTANT+"?q="+encodeQuery(query),
+            {headers:{Accept:"application/json"}}
         );
-      }
 
-      const location =
-        detectWeather();
-
-      const searchPromise =
-        tracebreakSearch();
-
-      const instantPromise =
-        location
-          ? weatherSearch(location)
-          : instantSearch();
-
-      try {
-        const data =
-          await searchPromise;
-
-        const list =
-          Array.isArray(
-            data.results
-          )
-            ? data.results
-            : [];
-
-        if (
-          data.corrected_query
-        ) {
-          showCorrection(
-            query,
-            data.corrected_query
-          );
+        if(response.ok){
+            showKnowledge(await response.json());
         }
-
-        results.textContent = "";
-        results.className = "";
-
-        if (!list.length) {
-          meta.textContent =
-            "No indexed results";
-
-          results.className =
-            "empty";
-
-          results.textContent =
-            "TraceBreak hasn't indexed anything matching that query yet.";
-        } else {
-          meta.textContent =
-            list.length +
-            " indexed results";
-
-          list
-            .slice(0,20)
-            .forEach(
-              renderResult
-            );
-        }
-      } catch (error) {
+    }catch(error){
         console.error(error);
+    }
+}
 
-        meta.textContent = "";
-
-        results.className =
-          "empty";
-
-        results.textContent =
-          "TraceBreak search is temporarily unavailable.";
-      }
-
-      try {
-        const data =
-          await instantPromise;
-
-        if (location) {
-          showWeather(data);
-        } else {
-          showKnowledge(data);
-        }
-      } catch (error) {
-        console.error(error);
-      }
+async function run(){
+    if(!query){
+        meta.textContent="";
+        localResults.className="empty";
+        localResults.textContent="Enter a search query.";
+        return;
     }
 
-    run();
-  </script>
+    /*
+     * Local search is deliberately awaited alone.
+     * External providers never block it.
+     */
+    try{
+        const data=await tracebreak();
+
+        const items=Array.isArray(data.results)
+            ?data.results:[];
+
+        showCorrection(data);
+
+        localResults.textContent="";
+
+        if(items.length){
+            meta.textContent=
+                items.length+
+                " TraceBreak results";
+
+            renderResults(
+                items,
+                localResults
+            );
+        }else{
+            meta.textContent="No indexed results";
+            localResults.className="empty";
+            localResults.textContent=
+                "TraceBreak hasn't indexed anything matching that query yet.";
+        }
+    }catch(error){
+        console.error(error);
+        meta.textContent="TraceBreak is temporarily unavailable.";
+    }
+
+    /*
+     * These start after local results have already rendered.
+     * Each provider is independent.
+     */
+    const youBox=document.createElement("section");
+    const threeSixtyBox=document.createElement("section");
+
+    externalResults.appendChild(youBox);
+    externalResults.appendChild(threeSixtyBox);
+
+    youBox.appendChild(providerHeader("You"));
+
+    const youStatus=providerStatus(
+        "You",
+        "searching..."
+    );
+
+    youBox.appendChild(youStatus);
+
+    provider("you")
+        .then(data=>{
+            youStatus.remove();
+
+            const items=
+                data?.providers?.you?.results||[];
+
+            if(items.length){
+                renderResults(
+                    items,
+                    youBox
+                );
+            }else{
+                youBox.appendChild(
+                    providerStatus(
+                        "You",
+                        "no results"
+                    )
+                );
+            }
+        })
+        .catch(error=>{
+            console.error(error);
+            youStatus.textContent=
+                "You · unavailable";
+        });
+
+    threeSixtyBox.appendChild(
+        providerHeader("360 Search")
+    );
+
+    const threeSixtyStatus=
+        providerStatus(
+            "360 Search",
+            "searching..."
+        );
+
+    threeSixtyBox.appendChild(
+        threeSixtyStatus
+    );
+
+    provider("360")
+        .then(data=>{
+            threeSixtyStatus.remove();
+
+            const items=
+                data?.providers?.["360"]?.results||[];
+
+            if(items.length){
+                renderResults(
+                    items,
+                    threeSixtyBox
+                );
+            }else{
+                threeSixtyBox.appendChild(
+                    providerStatus(
+                        "360 Search",
+                        "no results"
+                    )
+                );
+            }
+        })
+        .catch(error=>{
+            console.error(error);
+            threeSixtyStatus.textContent=
+                "360 Search · unavailable";
+        });
+
+    /*
+     * Knowledge is independent too.
+     */
+    knowledgeLookup();
+}
+
+run();
+</script>
+
 </body>
 </html>
