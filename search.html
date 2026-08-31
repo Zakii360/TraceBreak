@@ -9,307 +9,236 @@
 
 <style>
 :root{
-  font-family:Arial,Helvetica,sans-serif;
-  color:#171717;
-  background:#fff
+font-family:Arial,Helvetica,sans-serif;
+color:#171717;
+background:#fff
 }
-
-*{
-  box-sizing:border-box
-}
-
-body{
-  margin:0;
-  background:#fff
-}
-
+*{box-sizing:border-box}
+body{margin:0;background:#fff}
 header{
-  position:sticky;
-  top:0;
-  z-index:20;
-  padding:14px 24px;
-  border-bottom:1px solid #e7e7e7;
-  background:rgba(255,255,255,.95);
-  backdrop-filter:blur(12px)
+position:sticky;
+top:0;
+z-index:20;
+padding:14px 24px;
+border-bottom:1px solid #e7e7e7;
+background:rgba(255,255,255,.95);
+backdrop-filter:blur(12px)
 }
-
 .top{
-  width:min(1120px,100%);
-  margin:auto;
-  display:flex;
-  align-items:center;
-  gap:24px
+width:min(1120px,100%);
+margin:auto;
+display:flex;
+align-items:center;
+gap:24px
 }
-
 .brand{
-  color:#171717;
-  text-decoration:none;
-  font-size:20px;
-  font-weight:700;
-  letter-spacing:-1px;
-  white-space:nowrap
+color:#171717;
+text-decoration:none;
+font-size:20px;
+font-weight:700;
+letter-spacing:-1px;
+white-space:nowrap
 }
-
 .search{
-  display:flex;
-  width:min(760px,100%);
-  gap:8px
+display:flex;
+width:min(760px,100%);
+gap:8px
 }
-
 .search input{
-  width:100%;
-  height:42px;
-  padding:0 14px;
-  border:1px solid #ccc;
-  border-radius:7px;
-  outline:0;
-  color:#171717;
-  background:#fff;
-  font-size:15px
+width:100%;
+height:42px;
+padding:0 14px;
+border:1px solid #ccc;
+border-radius:7px;
+outline:0;
+font-size:15px
 }
-
 .search input:focus{
-  border-color:#777;
-  box-shadow:0 0 0 3px rgba(0,0,0,.05)
+border-color:#777;
+box-shadow:0 0 0 3px rgba(0,0,0,.05)
 }
-
 .search button{
-  height:42px;
-  padding:0 18px;
-  border:0;
-  border-radius:7px;
-  background:#171717;
-  color:#fff;
-  cursor:pointer
+height:42px;
+padding:0 18px;
+border:0;
+border-radius:7px;
+background:#171717;
+color:#fff;
+cursor:pointer
 }
-
 .layout{
-  width:min(1120px,calc(100% - 48px));
-  margin:30px auto 90px;
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 310px;
-  gap:50px
+width:min(1120px,calc(100% - 48px));
+margin:30px auto 90px;
+display:grid;
+grid-template-columns:minmax(0,1fr) 310px;
+gap:50px
 }
-
 .meta{
-  margin-bottom:22px;
-  color:#777;
-  font-size:13px
+margin-bottom:22px;
+color:#777;
+font-size:13px
 }
-
 .result{
-  margin-bottom:30px;
-  animation:appear .18s ease-out
+margin-bottom:30px;
+animation:appear .16s ease-out
 }
-
 @keyframes appear{
-  from{
-    opacity:0;
-    transform:translateY(4px)
-  }
-  to{
-    opacity:1;
-    transform:translateY(0)
-  }
+from{opacity:0;transform:translateY(4px)}
+to{opacity:1;transform:translateY(0)}
 }
-
 .result-head{
-  display:flex;
-  align-items:flex-start;
-  gap:9px
+display:flex;
+align-items:flex-start;
+gap:9px
 }
-
 .favicon{
-  width:20px;
-  height:20px;
-  margin-top:2px;
-  flex:0 0 20px;
-  object-fit:contain;
-  border-radius:4px
+width:20px;
+height:20px;
+margin-top:2px;
+flex:0 0 20px;
+object-fit:contain;
+border-radius:4px
 }
-
 .result-title{
-  color:#174ea6;
-  font-size:19px;
-  line-height:1.3;
-  text-decoration:none
+color:#174ea6;
+font-size:19px;
+line-height:1.3;
+text-decoration:none
 }
-
-.result-title:hover{
-  text-decoration:underline
-}
-
+.result-title:hover{text-decoration:underline}
 .result-url{
-  margin:5px 0 4px 29px;
-  overflow:hidden;
-  color:#28743b;
-  font-size:13px;
-  text-overflow:ellipsis;
-  white-space:nowrap
+margin:5px 0 4px 29px;
+overflow:hidden;
+color:#28743b;
+font-size:13px;
+text-overflow:ellipsis;
+white-space:nowrap
 }
-
 .description{
-  max-width:760px;
-  margin:0 0 0 29px;
-  color:#4b4b4b;
-  font-size:14px;
-  line-height:1.55
+max-width:760px;
+margin:0 0 0 29px;
+color:#4b4b4b;
+font-size:14px;
+line-height:1.55
 }
-
 .images{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:14px
+display:grid;
+grid-template-columns:repeat(3,minmax(0,1fr));
+gap:14px
 }
-
 .image-result{
-  overflow:hidden;
-  border:1px solid #e4e4e4;
-  border-radius:8px;
-  background:#fff;
-  transition:transform .15s ease,box-shadow .15s ease
+overflow:hidden;
+border:1px solid #e4e4e4;
+border-radius:8px;
+background:#fff;
+transition:transform .15s ease,box-shadow .15s ease
 }
-
 .image-result:hover{
-  transform:translateY(-2px);
-  box-shadow:0 5px 18px rgba(0,0,0,.08)
+transform:translateY(-2px);
+box-shadow:0 5px 18px rgba(0,0,0,.08)
 }
-
 .image-result a{
-  color:inherit;
-  text-decoration:none
+display:block;
+color:inherit;
+text-decoration:none
 }
-
 .image-result img{
-  display:block;
-  width:100%;
-  aspect-ratio:16/10;
-  object-fit:cover;
-  background:#f2f2f2
+display:block;
+width:100%;
+aspect-ratio:16/10;
+object-fit:cover;
+background:#f2f2f2
 }
-
 .image-info{
-  padding:10px
+padding:10px
 }
-
 .image-title{
-  overflow:hidden;
-  font-size:13px;
-  font-weight:600;
-  line-height:1.35;
-  text-overflow:ellipsis;
-  white-space:nowrap
+overflow:hidden;
+font-size:13px;
+font-weight:600;
+line-height:1.35;
+text-overflow:ellipsis;
+white-space:nowrap
 }
-
 .image-source{
-  overflow:hidden;
-  margin-top:4px;
-  color:#777;
-  font-size:11px;
-  text-overflow:ellipsis;
-  white-space:nowrap
+overflow:hidden;
+margin-top:4px;
+color:#777;
+font-size:11px;
+text-overflow:ellipsis;
+white-space:nowrap
 }
-
 .knowledge{
-  display:none;
-  align-self:start;
-  border-left:1px solid #e5e5e5;
-  padding-left:24px
+display:none;
+align-self:start;
+border-left:1px solid #e5e5e5;
+padding-left:24px
 }
-
-.knowledge.visible{
-  display:block
-}
-
+.knowledge.visible{display:block}
 .knowledge-label{
-  margin-bottom:15px;
-  color:#777;
-  font-size:11px;
-  font-weight:600;
-  letter-spacing:.1em;
-  text-transform:uppercase
+margin-bottom:15px;
+color:#777;
+font-size:11px;
+font-weight:600;
+letter-spacing:.1em;
+text-transform:uppercase
 }
-
 .knowledge-title{
-  margin:0;
-  font-size:24px;
-  line-height:1.2
+margin:0;
+font-size:24px;
+line-height:1.2
 }
-
 .knowledge-source{
-  margin:6px 0 15px;
-  color:#777;
-  font-size:12px
+margin:6px 0 15px;
+color:#777;
+font-size:12px
 }
-
 .knowledge-image{
-  display:block;
-  width:100%;
-  max-height:190px;
-  margin-bottom:15px;
-  border-radius:7px;
-  object-fit:cover
+display:block;
+width:100%;
+max-height:190px;
+margin-bottom:15px;
+border-radius:7px;
+object-fit:cover
 }
-
 .knowledge-description{
-  margin:0;
-  color:#444;
-  font-size:14px;
-  line-height:1.55
+margin:0;
+color:#444;
+font-size:14px;
+line-height:1.55
 }
-
 .knowledge-link{
-  display:inline-block;
-  margin-top:13px;
-  color:#174ea6;
-  font-size:13px;
-  text-decoration:none
+display:inline-block;
+margin-top:13px;
+color:#174ea6;
+font-size:13px;
+text-decoration:none
 }
-
 .empty{
-  padding:40px 0;
-  color:#777;
-  font-size:14px
+padding:40px 0;
+color:#777;
+font-size:14px
 }
-
 @media(max-width:850px){
-  .layout{
-    grid-template-columns:1fr
-  }
-
-  .knowledge{
-    border-top:1px solid #e5e5e5;
-    border-left:0;
-    padding:25px 0 0
-  }
+.layout{grid-template-columns:1fr}
+.knowledge{
+border-top:1px solid #e5e5e5;
+border-left:0;
+padding:25px 0 0
 }
-
+}
 @media(max-width:600px){
-  header{
-    padding:13px 16px
-  }
-
-  .top{
-    gap:14px
-  }
-
-  .search button{
-    display:none
-  }
-
-  .layout{
-    width:calc(100% - 32px);
-    margin-top:24px
-  }
-
-  .images{
-    grid-template-columns:repeat(2,minmax(0,1fr))
-  }
-
-  .result-url,
-  .description{
-    margin-left:0
-  }
+header{padding:13px 16px}
+.top{gap:14px}
+.search button{display:none}
+.layout{
+width:calc(100% - 32px);
+margin-top:24px
+}
+.images{
+grid-template-columns:repeat(2,minmax(0,1fr))
+}
+.result-url,.description{margin-left:0}
 }
 </style>
 </head>
@@ -318,27 +247,21 @@ header{
 
 <header>
 <div class="top">
-
 <a class="brand" href="index.html">TraceBreak</a>
 
 <form class="search" id="search-form">
 <input id="query" type="search" autocomplete="off" spellcheck="false">
 <button type="submit">Search</button>
 </form>
-
 </div>
 </header>
 
 <main class="layout">
 
 <section>
-
 <div class="meta" id="meta">Searching...</div>
-
 <div id="results"></div>
-
 <div id="images"></div>
-
 </section>
 
 <aside class="knowledge" id="knowledge">
@@ -360,9 +283,6 @@ BASE+"tracebreak-meta";
 
 const INSTANT=
 BASE+"tracebreak-instant-v2";
-
-const IMAGE_SEARCH=
-BASE+"tracebreak-image-search";
 
 const params=
 new URLSearchParams(location.search);
@@ -395,578 +315,550 @@ input.value=
 query.replace(/\+/g," ");
 
 function encodeQuery(value){
-  let out="";
+let out="";
 
-  for(const char of value.trim()){
-    out+=
-      char==="+"?
-      "+":
-      encodeURIComponent(char);
-  }
+for(const char of value.trim()){
+out+=
+char==="+"?
+"+":
+encodeURIComponent(char);
+}
 
-  return out;
+return out;
 }
 
 document
 .getElementById("search-form")
 .addEventListener("submit",event=>{
-  event.preventDefault();
+event.preventDefault();
 
-  const value=
-    input.value.trim();
+const value=
+input.value.trim();
 
-  if(value){
-    location.href=
-      "search.html?q="+
-      encodeQuery(value);
-  }
+if(!value)return;
+
+location.href=
+"search.html?q="+
+encodeQuery(value);
 });
 
 function canonical(url){
-  try{
-    const u=
-      new URL(url);
+try{
+const u=
+new URL(url);
 
-    u.hash="";
+u.hash="";
 
-    [
-      "utm_source",
-      "utm_medium",
-      "utm_campaign",
-      "utm_term",
-      "utm_content",
-      "gclid",
-      "fbclid",
-      "msclkid"
-    ].forEach(key=>{
-      u.searchParams.delete(key);
-    });
+[
+"utm_source",
+"utm_medium",
+"utm_campaign",
+"utm_term",
+"utm_content",
+"gclid",
+"fbclid",
+"msclkid",
+"dclid"
+].forEach(key=>{
+u.searchParams.delete(key);
+});
 
-    return u.toString();
-  }catch{
-    return url;
-  }
+return u.toString();
+}catch{
+return url;
+}
 }
 
-function favicon(url){
-  try{
-    const u=
-      new URL(url);
+function makeFavicon(url){
+try{
+const u=
+new URL(url);
 
-    const img=
-      document.createElement("img");
+const img=
+document.createElement("img");
 
-    img.className=
-      "favicon";
+img.className="favicon";
+img.alt="";
+img.loading="lazy";
+img.src=
+u.origin+
+"/favicon.ico";
 
-    img.alt="";
+img.onerror=()=>{
+img.remove();
+};
 
-    img.loading=
-      "lazy";
-
-    img.src=
-      u.origin+
-      "/favicon.ico";
-
-    img.onerror=()=>{
-      img.remove();
-    };
-
-    return img;
-  }catch{
-    return null;
-  }
+return img;
+}catch{
+return null;
+}
 }
 
 function addResult(item){
-  if(!item?.url){
-    return false;
-  }
+if(!item?.url)return false;
 
-  const key=
-    canonical(item.url);
+const key=
+canonical(item.url);
 
-  if(seen.has(key)){
-    return false;
-  }
+if(seen.has(key))return false;
 
-  seen.add(key);
+seen.add(key);
 
-  const article=
-    document.createElement("article");
+const article=
+document.createElement("article");
 
-  article.className=
-    "result";
+article.className="result";
 
-  const head=
-    document.createElement("div");
+const head=
+document.createElement("div");
 
-  head.className=
-    "result-head";
+head.className="result-head";
 
-  const icon=
-    item.favicon?
-    document.createElement("img"):
-    favicon(item.url);
+if(item.favicon){
+const icon=
+document.createElement("img");
 
-  if(item.favicon){
-    icon.className=
-      "favicon";
+icon.className="favicon";
+icon.src=item.favicon;
+icon.alt="";
+icon.loading="lazy";
 
-    icon.src=
-      item.favicon;
+icon.onerror=()=>{
+const fallback=
+makeFavicon(item.url);
 
-    icon.alt="";
+if(fallback){
+icon.replaceWith(fallback);
+}else{
+icon.remove();
+}
+};
 
-    icon.loading=
-      "lazy";
-  }
+head.appendChild(icon);
+}else{
+const icon=
+makeFavicon(item.url);
 
-  if(icon){
-    head.appendChild(icon);
-  }
-
-  const title=
-    document.createElement("a");
-
-  title.className=
-    "result-title";
-
-  title.href=
-    item.url;
-
-  title.target=
-    "_blank";
-
-  title.rel=
-    "noopener noreferrer";
-
-  title.textContent=
-    item.title||
-    item.url;
-
-  head.appendChild(title);
-
-  const url=
-    document.createElement("div");
-
-  url.className=
-    "result-url";
-
-  url.textContent=
-    item.url;
-
-  const description=
-    document.createElement("p");
-
-  description.className=
-    "description";
-
-  description.textContent=
-    item.description||
-    "";
-
-  article.appendChild(head);
-  article.appendChild(url);
-  article.appendChild(description);
-
-  results.appendChild(article);
-
-  return true;
+if(icon)head.appendChild(icon);
 }
 
-function addImages(items){
-  if(!Array.isArray(items)||!items.length){
-    return;
-  }
+const title=
+document.createElement("a");
 
-  const grid=
-    document.createElement("div");
+title.className="result-title";
+title.href=item.url;
+title.target="_blank";
+title.rel="noopener noreferrer";
+title.textContent=
+item.title||
+item.url;
 
-  grid.className=
-    "images";
+head.appendChild(title);
 
-  for(const item of items){
-    if(!item?.image){
-      continue;
-    }
+const url=
+document.createElement("div");
 
-    const card=
-      document.createElement("article");
+url.className="result-url";
+url.textContent=item.url;
 
-    card.className=
-      "image-result";
+const description=
+document.createElement("p");
 
-    const link=
-      document.createElement("a");
+description.className="description";
+description.textContent=
+item.description||
+"";
 
-    link.href=
-      item.url||
-      item.image;
+article.appendChild(head);
+article.appendChild(url);
+article.appendChild(description);
 
-    link.target=
-      "_blank";
+results.appendChild(article);
 
-    link.rel=
-      "noopener noreferrer";
-
-    const image=
-      document.createElement("img");
-
-    image.src=
-      item.image;
-
-    image.alt=
-      item.title||
-      "";
-
-    image.loading=
-      "lazy";
-
-    image.onerror=()=>{
-      card.remove();
-    };
-
-    const info=
-      document.createElement("div");
-
-    info.className=
-      "image-info";
-
-    const title=
-      document.createElement("div");
-
-    title.className=
-      "image-title";
-
-    title.textContent=
-      item.title||
-      "Image";
-
-    const source=
-      document.createElement("div");
-
-    source.className=
-      "image-source";
-
-    source.textContent=
-      item.source||
-      "";
-
-    info.appendChild(title);
-    info.appendChild(source);
-
-    link.appendChild(image);
-    link.appendChild(info);
-
-    card.appendChild(link);
-    grid.appendChild(card);
-  }
-
-  if(grid.children.length){
-    images.appendChild(grid);
-  }
-}
-
-async function localSearch(){
-  const response=
-    await fetch(
-      SEARCH+
-      "?q="+
-      encodeQuery(query)+
-      "&limit=100"
-    );
-
-  if(!response.ok){
-    throw new Error(
-      "TraceBreak search failed"
-    );
-  }
-
-  return response.json();
-}
-
-async function externalSearch(provider){
-  const controller=
-    new AbortController();
-
-  const timer=
-    setTimeout(
-      ()=>controller.abort(),
-      6500
-    );
-
-  try{
-    const response=
-      await fetch(
-        META+
-        "?q="+
-        encodeQuery(query)+
-        "&type=web"+
-        "&limit=20"+
-        "&provider="+
-        provider,
-        {
-          signal:
-            controller.signal
-        }
-      );
-
-    if(!response.ok){
-      throw new Error(
-        provider+
-        " failed"
-      );
-    }
-
-    return response.json();
-  }finally{
-    clearTimeout(timer);
-  }
-}
-
-async function imageSearch(){
-  try{
-    const response=
-      await fetch(
-        IMAGE_SEARCH+
-        "?q="+
-        encodeQuery(query)+
-        "&limit=30"
-      );
-
-    if(!response.ok){
-      return;
-    }
-
-    const data=
-      await response.json();
-
-    addImages(
-      data.results
-    );
-
-  }catch(error){
-    console.error(error);
-  }
-}
-
-async function showKnowledge(){
-  try{
-    const response=
-      await fetch(
-        INSTANT+
-        "?q="+
-        encodeQuery(query)
-      );
-
-    if(!response.ok){
-      return;
-    }
-
-    const data=
-      await response.json();
-
-    const item=
-      data.wikipedia?.title?
-      data.wikipedia:
-      data.duckduckgo;
-
-    if(!item?.title&&!item?.description){
-      return;
-    }
-
-    knowledgeContent.textContent="";
-
-    const title=
-      document.createElement("h2");
-
-    title.className=
-      "knowledge-title";
-
-    title.textContent=
-      item.title||
-      query;
-
-    const source=
-      document.createElement("div");
-
-    source.className=
-      "knowledge-source";
-
-    source.textContent=
-      data.wikipedia?.title?
-      "Wikipedia":
-      "DuckDuckGo";
-
-    knowledgeContent.appendChild(title);
-    knowledgeContent.appendChild(source);
-
-    if(item.image){
-      const image=
-        document.createElement("img");
-
-      image.className=
-        "knowledge-image";
-
-      image.src=
-        item.image;
-
-      image.alt="";
-
-      image.loading=
-        "lazy";
-
-      knowledgeContent.appendChild(image);
-    }
-
-    if(item.description){
-      const description=
-        document.createElement("p");
-
-      description.className=
-        "knowledge-description";
-
-      description.textContent=
-        item.description;
-
-      knowledgeContent.appendChild(
-        description
-      );
-    }
-
-    if(item.url){
-      const link=
-        document.createElement("a");
-
-      link.className=
-        "knowledge-link";
-
-      link.href=
-        item.url;
-
-      link.target=
-        "_blank";
-
-      link.rel=
-        "noopener noreferrer";
-
-      link.textContent=
-        "Source";
-
-      knowledgeContent.appendChild(link);
-    }
-
-    knowledge.classList.add(
-      "visible"
-    );
-
-  }catch(error){
-    console.error(error);
-  }
-}
-
-async function run(){
-  if(!query){
-    meta.textContent="";
-    results.className=
-      "empty";
-
-    results.textContent=
-      "Enter a search query.";
-
-    return;
-  }
-
-  /*
-   * Local TraceBreak results first.
-   */
-  try{
-    const data=
-      await localSearch();
-
-    const count=
-      Array.isArray(data.results)?
-      data.results.filter(
-        addResult
-      ).length:
-      0;
-
-    meta.textContent=
-      count+
-      (count===1?
-        " result":
-        " results");
-
-  }catch(error){
-    console.error(error);
-
-    meta.textContent=
-      "TraceBreak is temporarily unavailable.";
-  }
-
-  /*
-   * External sources never block
-   * local search.
-   */
-  Promise.allSettled([
-    externalSearch("you"),
-    externalSearch("360")
-  ]).then(items=>{
-    for(const item of items){
-      if(item.status!=="fulfilled"){
-        continue;
-      }
-
-      const providers=
-        item.value?.providers;
-
-      if(!providers){
-        continue;
-      }
-
-      addResults(
-        providers.you?.results
-      );
-
-      addResults(
-        providers["360"]?.results
-      );
-    }
-
-    const count=
-      document.querySelectorAll(
-        ".result"
-      ).length;
-
-    if(count){
-      meta.textContent=
-        count+
-        (count===1?
-          " result":
-          " results");
-    }
-  });
-
-  /*
-   * Image search is independent.
-   */
-  imageSearch();
-
-  /*
-   * Knowledge panel is independent.
-   */
-  showKnowledge();
+return true;
 }
 
 function addResults(items){
-  if(!Array.isArray(items)){
-    return;
-  }
+if(!Array.isArray(items))return 0;
 
-  for(const item of items){
-    addResult(item);
-  }
+let count=0;
+
+for(const item of items){
+if(addResult(item))count++;
+}
+
+return count;
+}
+
+function addImages(items){
+if(!Array.isArray(items)||!items.length)return;
+
+const grid=
+document.createElement("div");
+
+grid.className="images";
+
+for(const item of items){
+if(!item?.image_url&&!item?.image)return;
+
+const imageUrl=
+item.image_url||
+item.image;
+
+const pageUrl=
+item.page_url||
+item.url||
+imageUrl;
+
+const card=
+document.createElement("article");
+
+card.className="image-result";
+
+const link=
+document.createElement("a");
+
+link.href=pageUrl;
+link.target="_blank";
+link.rel="noopener noreferrer";
+
+const image=
+document.createElement("img");
+
+image.src=imageUrl;
+image.alt=
+item.alt||
+item.title||
+"";
+image.loading="lazy";
+
+image.onerror=()=>{
+card.remove();
+};
+
+const info=
+document.createElement("div");
+
+info.className="image-info";
+
+const title=
+document.createElement("div");
+
+title.className="image-title";
+title.textContent=
+item.title||
+item.alt||
+"Image";
+
+const source=
+document.createElement("div");
+
+source.className="image-source";
+
+try{
+source.textContent=
+new URL(pageUrl).hostname;
+}catch{
+source.textContent="";
+}
+
+info.appendChild(title);
+info.appendChild(source);
+
+link.appendChild(image);
+link.appendChild(info);
+
+card.appendChild(link);
+grid.appendChild(card);
+}
+
+if(grid.children.length){
+images.appendChild(grid);
+}
+}
+
+async function localSearch(){
+const response=
+await fetch(
+SEARCH+
+"?q="+
+encodeQuery(query)+
+"&limit=100",
+{
+headers:{
+Accept:"application/json"
+}
+}
+);
+
+if(!response.ok){
+throw Error(
+"TraceBreak search failed"
+);
+}
+
+return response.json();
+}
+
+async function externalSearch(provider){
+const controller=
+new AbortController();
+
+const timer=
+setTimeout(
+()=>controller.abort(),
+5000
+);
+
+try{
+const response=
+await fetch(
+META+
+"?q="+
+encodeQuery(query)+
+"&type=web"+
+"&limit=20"+
+"&provider="+
+provider,
+{
+signal:controller.signal,
+headers:{
+Accept:"application/json"
+}
+}
+);
+
+if(!response.ok){
+throw Error(
+provider+
+" search failed"
+);
+}
+
+return response.json();
+}finally{
+clearTimeout(timer);
+}
+}
+
+async function imageSearch(){
+try{
+const response=
+await fetch(
+SEARCH+
+"?q="+
+encodeQuery(query)+
+"&type=image"+
+"&limit=50",
+{
+headers:{
+Accept:"application/json"
+}
+}
+);
+
+if(!response.ok)return;
+
+const data=
+await response.json();
+
+addImages(
+data.results||
+data.images||
+[]
+);
+
+}catch(error){
+console.error(error);
+}
+}
+
+async function knowledgeSearch(){
+try{
+const response=
+await fetch(
+INSTANT+
+"?q="+
+encodeQuery(query),
+{
+headers:{
+Accept:"application/json"
+}
+}
+);
+
+if(!response.ok)return;
+
+const data=
+await response.json();
+
+const item=
+data.wikipedia?.title?
+data.wikipedia:
+data.duckduckgo;
+
+if(!item?.title&&!item?.description){
+return;
+}
+
+knowledgeContent.textContent="";
+
+const title=
+document.createElement("h2");
+
+title.className=
+"knowledge-title";
+
+title.textContent=
+item.title||
+query;
+
+const source=
+document.createElement("div");
+
+source.className=
+"knowledge-source";
+
+source.textContent=
+data.wikipedia?.title?
+"Wikipedia":
+"DuckDuckGo";
+
+knowledgeContent.appendChild(title);
+knowledgeContent.appendChild(source);
+
+if(item.image){
+const image=
+document.createElement("img");
+
+image.className=
+"knowledge-image";
+
+image.src=item.image;
+image.alt="";
+image.loading="lazy";
+
+knowledgeContent.appendChild(image);
+}
+
+if(item.description){
+const description=
+document.createElement("p");
+
+description.className=
+"knowledge-description";
+
+description.textContent=
+item.description;
+
+knowledgeContent.appendChild(description);
+}
+
+if(item.url){
+const link=
+document.createElement("a");
+
+link.className=
+"knowledge-link";
+
+link.href=item.url;
+link.target="_blank";
+link.rel="noopener noreferrer";
+link.textContent="Source";
+
+knowledgeContent.appendChild(link);
+}
+
+knowledge.classList.add(
+"visible"
+);
+
+}catch(error){
+console.error(error);
+}
+}
+
+async function run(){
+if(!query){
+meta.textContent="";
+results.className="empty";
+results.textContent=
+"Enter a search query.";
+return;
+}
+
+/*
+ * The local index gets priority.
+ */
+try{
+const data=
+await localSearch();
+
+const count=
+addResults(
+Array.isArray(data.results)?
+data.results:
+[]
+);
+
+meta.textContent=
+count+
+(count===1?
+" result":
+" results");
+
+}catch(error){
+console.error(error);
+
+meta.textContent=
+"TraceBreak is temporarily unavailable.";
+}
+
+/*
+ * Nothing below blocks local results.
+ */
+Promise.allSettled([
+externalSearch("you"),
+externalSearch("360")
+]).then(all=>{
+for(const result of all){
+if(result.status!=="fulfilled"){
+continue;
+}
+
+const providers=
+result.value?.providers;
+
+if(!providers)continue;
+
+addResults(
+providers.you?.results
+);
+
+addResults(
+providers["360"]?.results
+);
+}
+
+const count=
+document.querySelectorAll(
+".result"
+).length;
+
+if(count){
+meta.textContent=
+count+
+(count===1?
+" result":
+" results");
+}
+});
+
+/*
+ * Images and knowledge are independent.
+ */
+imageSearch();
+knowledgeSearch();
 }
 
 run();
