@@ -134,7 +134,7 @@
     }
 
     .result-url {
-      margin: 5px 0 4px;
+      margin: 5px 0 4px 30px;
       overflow: hidden;
       color: #28743b;
       font-size: 13px;
@@ -240,6 +240,7 @@
         margin-top: 24px;
       }
 
+      .result-url,
       .description {
         margin-left: 0;
       }
@@ -271,7 +272,8 @@
   </main>
 
   <script>
-    const API = "https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/tracebreak-search";
+    const SUPABASE_FUNCTION =
+      "https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/tracebreak-search";
 
     const params = new URLSearchParams(location.search);
     const query = params.get("q") || "";
@@ -284,43 +286,39 @@
 
     input.value = query;
 
-    function queryText(value) {
+    function encodeQuery(value) {
       return value.trim().split(/\s+/).join("+");
     }
 
-    function go(value) {
-      value = value.trim();
+    function searchUrl(value) {
+      return "search.html?q=" + encodeQuery(value);
+    }
+
+    document.getElementById("search").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const value = input.value.trim();
 
       if (!value) {
         return;
       }
 
-      location.href = "search.html?q=" + queryText(value);
-    }
-
-    document.getElementById("search").addEventListener("submit", event => {
-      event.preventDefault();
-      go(input.value);
+      location.href = searchUrl(value);
     });
 
-    function favicon(url) {
-      try {
-        const host = new URL(url).hostname;
-
+    function getFavicon(item) {
+      if (item.favicon) {
         const image = document.createElement("img");
+
         image.className = "favicon";
-        image.src = "https://www.google.com/s2/favicons?domain=" + host + "&sz=32";
+        image.src = item.favicon;
         image.alt = "";
         image.loading = "lazy";
 
-        image.onerror = () => {
-          image.remove();
-        };
-
         return image;
-      } catch {
-        return null;
       }
+
+      return null;
     }
 
     function addResult(item) {
@@ -330,32 +328,38 @@
       const head = document.createElement("div");
       head.className = "result-head";
 
-      const icon = favicon(item.url);
+      const icon = getFavicon(item);
 
       if (icon) {
         head.appendChild(icon);
       }
 
       const title = document.createElement("a");
+
       title.className = "result-title";
       title.href = item.url;
       title.target = "_blank";
-      title.rel = "noopener";
+      title.rel = "noopener noreferrer";
       title.textContent = item.title || item.url;
 
       head.appendChild(title);
 
-      const url = document.createElement("div");
-      url.className = "result-url";
-      url.textContent = item.url;
+      const resultUrl = document.createElement("div");
+
+      resultUrl.className = "result-url";
+      resultUrl.textContent = item.url;
 
       const description = document.createElement("p");
+
       description.className = "description";
       description.textContent =
         item.description ||
         "No description available.";
 
-      article.append(head, url, description);
+      article.appendChild(head);
+      article.appendChild(resultUrl);
+      article.appendChild(description);
+
       results.appendChild(article);
     }
 
@@ -375,31 +379,38 @@
       source.className = "knowledge-source";
       source.textContent = panel.source || "Knowledge";
 
-      knowledgeContent.append(title, source);
+      knowledgeContent.appendChild(title);
+      knowledgeContent.appendChild(source);
 
       if (panel.image_url) {
         const image = document.createElement("img");
+
         image.className = "knowledge-image";
         image.src = panel.image_url;
         image.alt = "";
         image.loading = "lazy";
+
         knowledgeContent.appendChild(image);
       }
 
       if (panel.description) {
         const description = document.createElement("p");
+
         description.className = "knowledge-description";
         description.textContent = panel.description;
+
         knowledgeContent.appendChild(description);
       }
 
       if (panel.source_url) {
         const link = document.createElement("a");
+
         link.className = "knowledge-link";
         link.href = panel.source_url;
         link.target = "_blank";
-        link.rel = "noopener";
+        link.rel = "noopener noreferrer";
         link.textContent = "Read more";
+
         knowledgeContent.appendChild(link);
       }
 
@@ -415,20 +426,30 @@
       }
 
       try {
-        const response = await fetch(
-          API + "?q=" + queryText(query) + "&limit=20"
-        );
+        const request =
+          SUPABASE_FUNCTION +
+          "?q=" +
+          encodeQuery(query) +
+          "&limit=100";
+
+        const response = await fetch(request, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
 
         if (!response.ok) {
-          throw new Error("Search failed");
+          throw new Error("Search request failed");
         }
 
         const data = await response.json();
+        const list = Array.isArray(data.results)
+          ? data.results
+          : [];
 
         results.textContent = "";
         results.className = "";
-
-        const list = data.results || [];
 
         if (!list.length) {
           meta.textContent = "No results";
@@ -437,14 +458,22 @@
           return;
         }
 
-        meta.textContent = list.length + " results";
+        meta.textContent =
+          list.length +
+          " results";
 
-        list.forEach(addResult);
+        list
+          .slice(0, 20)
+          .forEach(addResult);
+
         showKnowledge(data);
-      } catch {
+      } catch (error) {
+        console.error(error);
+
         meta.textContent = "";
         results.className = "empty";
-        results.textContent = "Search is temporarily unavailable.";
+        results.textContent =
+          "Search is temporarily unavailable.";
       }
     }
 
