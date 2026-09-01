@@ -4,52 +4,269 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TraceBreak</title>
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="description" content="Trace the web, not the user.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#181818;background:#fff}
-header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #e5e5e5}
-.top{width:min(1160px,calc(100% - 32px));margin:auto;min-height:68px;display:flex;align-items:center;gap:24px}
-.logo{font-weight:700;font-size:21px;letter-spacing:-1px;text-decoration:none;color:#111}
-.search{display:flex;flex:1;max-width:760px}
-.search input{width:100%;height:42px;border:1px solid #ccc;border-radius:7px 0 0 7px;padding:0 14px;font-size:15px;outline:none}
-.search input:focus{border-color:#777}
-.search button{height:42px;border:0;background:#171717;color:#fff;padding:0 20px;border-radius:0 7px 7px 0;cursor:pointer}
-.layout{width:min(1160px,calc(100% - 32px));margin:25px auto 80px;display:grid;grid-template-columns:minmax(0,760px) 320px;gap:55px}
-.stats{font-size:13px;color:#777;margin-bottom:24px}
-.result{margin-bottom:27px}
-.resultTop{display:flex;gap:9px}
-.icon{width:19px;height:19px;object-fit:contain;margin-top:3px;border-radius:4px}
-.resultTitle{font-size:19px;line-height:1.3;color:#174ea6;text-decoration:none}
-.resultTitle:hover{text-decoration:underline}
-.url{margin:5px 0 4px 28px;font-size:13px;color:#28743b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.desc{margin:0 0 0 28px;font-size:14px;line-height:1.55;color:#4b4b4b}
-.panel{display:none;border-left:1px solid #e5e5e5;padding-left:24px}
-.panel.show{display:block}
-.panelLabel{font-size:11px;color:#777;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:13px}
-.panel h2{font-size:24px;margin:0 0 5px;line-height:1.2}
-.panelSource{font-size:12px;color:#777;margin-bottom:14px}
-.panel img{display:block;width:100%;max-height:190px;object-fit:cover;border-radius:7px;margin-bottom:14px}
-.panel p{font-size:14px;line-height:1.55;color:#444;margin:0}
-.panel a{display:inline-block;margin-top:12px;font-size:13px;color:#174ea6;text-decoration:none}
-.tool{border:1px solid #e4e4e4;border-radius:9px;padding:15px;margin-bottom:18px}
-.toolTitle{font-size:13px;font-weight:700;margin-bottom:8px}
-.toolValue{font-size:22px}
-.toolSmall{font-size:13px;color:#666;margin-top:4px}
-.weatherIcon{font-size:27px;margin-right:8px}
-.imageGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 28px}
-.imageGrid img{width:100%;height:110px;object-fit:cover;border-radius:6px}
-@media(max-width:850px){
-.layout{grid-template-columns:1fr}
-.panel{border-left:0;border-top:1px solid #e5e5e5;padding:24px 0 0}
+
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+color:#171717;
+background:#fff
 }
+
+header{
+position:sticky;
+top:0;
+z-index:20;
+background:rgba(255,255,255,.96);
+backdrop-filter:blur(14px);
+border-bottom:1px solid #e7e7e7
+}
+
+.top{
+width:min(1160px,calc(100% - 32px));
+min-height:68px;
+margin:auto;
+display:flex;
+align-items:center;
+gap:24px
+}
+
+.logo{
+color:#111;
+font-size:21px;
+font-weight:700;
+letter-spacing:-1px;
+text-decoration:none;
+white-space:nowrap
+}
+
+.search{
+display:flex;
+flex:1;
+max-width:760px
+}
+
+.search input{
+width:100%;
+height:42px;
+padding:0 14px;
+border:1px solid #ccc;
+border-right:0;
+border-radius:7px 0 0 7px;
+outline:0;
+font-size:15px
+}
+
+.search input:focus{
+border-color:#777
+}
+
+.search button{
+height:42px;
+padding:0 19px;
+border:0;
+border-radius:0 7px 7px 0;
+background:#171717;
+color:#fff;
+cursor:pointer
+}
+
+.layout{
+width:min(1160px,calc(100% - 32px));
+margin:26px auto 90px;
+display:grid;
+grid-template-columns:minmax(0,760px) 320px;
+gap:55px
+}
+
+.stats{
+margin-bottom:24px;
+font-size:13px;
+color:#777
+}
+
+.result{
+margin-bottom:28px;
+animation:appear .12s ease-out
+}
+
+@keyframes appear{
+from{opacity:0;transform:translateY(3px)}
+to{opacity:1;transform:none}
+}
+
+.resultTop{
+display:flex;
+align-items:flex-start;
+gap:9px
+}
+
+.icon{
+width:19px;
+height:19px;
+margin-top:3px;
+border-radius:4px;
+object-fit:contain;
+flex:0 0 19px
+}
+
+.resultTitle{
+color:#174ea6;
+font-size:19px;
+line-height:1.3;
+text-decoration:none
+}
+
+.resultTitle:hover{
+text-decoration:underline
+}
+
+.url{
+margin:5px 0 4px 28px;
+overflow:hidden;
+color:#28743b;
+font-size:13px;
+text-overflow:ellipsis;
+white-space:nowrap
+}
+
+.desc{
+margin:0 0 0 28px;
+color:#4b4b4b;
+font-size:14px;
+line-height:1.55
+}
+
+.panel{
+display:none;
+align-self:start;
+border-left:1px solid #e5e5e5;
+padding-left:24px
+}
+
+.panel.show{
+display:block
+}
+
+.panelLabel{
+margin-bottom:13px;
+color:#777;
+font-size:11px;
+font-weight:700;
+letter-spacing:.1em;
+text-transform:uppercase
+}
+
+.panel h2{
+margin:0 0 5px;
+font-size:24px;
+line-height:1.2
+}
+
+.panelSource{
+margin-bottom:14px;
+color:#777;
+font-size:12px
+}
+
+.panelImage{
+display:block;
+width:100%;
+max-height:190px;
+margin-bottom:14px;
+border-radius:7px;
+object-fit:cover
+}
+
+.panelText{
+margin:0;
+color:#444;
+font-size:14px;
+line-height:1.55
+}
+
+.panelLink{
+display:inline-block;
+margin-top:12px;
+color:#174ea6;
+font-size:13px;
+text-decoration:none
+}
+
+.tool{
+margin-bottom:18px;
+padding:15px;
+border:1px solid #e4e4e4;
+border-radius:9px
+}
+
+.toolTitle{
+margin-bottom:8px;
+font-size:13px;
+font-weight:700
+}
+
+.toolValue{
+font-size:22px
+}
+
+.toolSmall{
+margin-top:4px;
+color:#666;
+font-size:13px
+}
+
+.imageGrid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:8px;
+margin-bottom:28px
+}
+
+.imageGrid img{
+width:100%;
+height:110px;
+border-radius:6px;
+object-fit:cover
+}
+
+@media(max-width:850px){
+.layout{
+grid-template-columns:1fr
+}
+
+.panel{
+border-top:1px solid #e5e5e5;
+border-left:0;
+padding:24px 0 0
+}
+}
+
 @media(max-width:600px){
-.top{gap:12px}
-.logo{font-size:18px}
-.search button{display:none}
-.search input{border-radius:7px}
-.url,.desc{margin-left:0}
+.top{
+gap:12px
+}
+
+.logo{
+font-size:18px
+}
+
+.search button{
+display:none
+}
+
+.search input{
+border-right:1px solid #ccc;
+border-radius:7px
+}
+
+.url,.desc{
+margin-left:0
+}
 }
 </style>
 </head>
@@ -58,43 +275,57 @@ header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid 
 
 <header>
 <div class="top">
-<a class="logo" href="index.html">TraceBreak</a>
 
-<form class="search" id="form">
-<input id="q" type="search" autocomplete="off" spellcheck="false">
-<button>Search</button>
+<a class="logo" href="/">TraceBreak</a>
+
+<form class="search" id="searchForm">
+<input
+id="queryInput"
+type="search"
+autocomplete="off"
+spellcheck="false"
+>
+<button type="submit">Search</button>
 </form>
+
 </div>
 </header>
 
 <main class="layout">
 
 <section>
-<div class="stats" id="stats">Searching...</div>
+
+<div class="stats" id="stats">
+Searching...
+</div>
+
 <div id="tools"></div>
 <div id="images"></div>
 <div id="results"></div>
+
 </section>
 
-<aside class="panel" id="panel">
-<div class="panelLabel">Knowledge</div>
-<div id="panelBody"></div>
+<aside class="panel" id="knowledge">
+
+<div class="panelLabel">
+Knowledge
+</div>
+
+<div id="knowledgeBody"></div>
+
 </aside>
 
 </main>
 
 <script>
-const SUPA=
+const SUPABASE=
 "https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/";
 
-const params=
-new URLSearchParams(location.search);
-
 const query=
-(params.get("q")||"").trim();
+(new URLSearchParams(location.search).get("q")||"").trim();
 
-const q=
-document.getElementById("q");
+const input=
+document.getElementById("queryInput");
 
 const stats=
 document.getElementById("stats");
@@ -109,10 +340,10 @@ const images=
 document.getElementById("images");
 
 const panel=
-document.getElementById("panel");
+document.getElementById("knowledge");
 
 const panelBody=
-document.getElementById("panelBody");
+document.getElementById("knowledgeBody");
 
 const started=
 performance.now();
@@ -120,10 +351,10 @@ performance.now();
 const seen=
 new Set();
 
-q.value=
+input.value=
 query.replace(/\+/g," ");
 
-function plusQuery(value){
+function encodeQuery(value){
 return value
 .trim()
 .split(/\s+/)
@@ -132,21 +363,24 @@ return value
 }
 
 document
-.getElementById("form")
-.addEventListener("submit",e=>{
-e.preventDefault();
+.getElementById("searchForm")
+.addEventListener("submit",event=>{
+event.preventDefault();
 
 const value=
-q.value.trim();
+input.value.trim();
 
-if(value){
+if(!value)return;
+
 location.href=
-"search.html?q="+plusQuery(value);
-}
+"/search.html?q="+
+encodeQuery(value);
 });
 
 function elapsed(){
-return Math.round(performance.now()-started);
+return Math.round(
+performance.now()-started
+);
 }
 
 function updateStats(){
@@ -161,8 +395,32 @@ elapsed()+
 " ms";
 }
 
-function key(url){
+function cleanSnippet(value){
+if(!value)return "";
+
+let text=
+String(value)
+.replace(/\s+/g," ")
+.trim();
+
+text=
+text.replace(
+/^(summary|highlights|notes|overview|description)\s*:\s*/i,
+""
+);
+
+if(text.length>320){
+text=
+text.slice(0,317).trimEnd()+
+"...";
+}
+
+return text;
+}
+
+function canonical(url){
 try{
+
 const u=
 new URL(url);
 
@@ -176,17 +434,22 @@ u.hash="";
 "utm_content",
 "gclid",
 "fbclid",
-"msclkid"
-].forEach(x=>u.searchParams.delete(x));
+"msclkid",
+"dclid"
+].forEach(key=>{
+u.searchParams.delete(key);
+});
 
 return u.toString();
+
 }catch{
 return url;
 }
 }
 
-function makeIcon(url){
+function favicon(url){
 try{
+
 const u=
 new URL(url);
 
@@ -194,35 +457,40 @@ const img=
 document.createElement("img");
 
 img.className="icon";
-img.loading="lazy";
 img.alt="";
+img.loading="lazy";
 img.src=
-u.origin+"/favicon.ico";
+u.origin+
+"/favicon.ico";
 
 img.onerror=()=>{
 img.remove();
 };
 
 return img;
+
 }catch{
 return null;
 }
 }
 
 function addResult(item){
+
+if(!item)return false;
+
 const url=
-item?.url||
-item?.link||
-item?.href;
+item.url||
+item.link||
+item.href;
 
 if(!url)return false;
 
-const k=
-key(url);
+const key=
+canonical(url);
 
-if(seen.has(k))return false;
+if(seen.has(key))return false;
 
-seen.add(k);
+seen.add(key);
 
 const article=
 document.createElement("article");
@@ -235,21 +503,30 @@ document.createElement("div");
 top.className="resultTop";
 
 const icon=
-item.favicon?
-document.createElement("img"):
-makeIcon(url);
+item.favicon
+?
+document.createElement("img")
+:
+favicon(url);
 
 if(icon){
+
 icon.className="icon";
-icon.loading="lazy";
 icon.alt="";
+icon.loading="lazy";
 
 if(item.favicon){
 icon.src=item.favicon;
+
 icon.onerror=()=>{
-const fallback=makeIcon(url);
-if(fallback)icon.replaceWith(fallback);
-else icon.remove();
+const fallback=
+favicon(url);
+
+if(fallback){
+icon.replaceWith(fallback);
+}else{
+icon.remove();
+}
 };
 }
 
@@ -276,16 +553,25 @@ document.createElement("div");
 urlNode.className="url";
 urlNode.textContent=url;
 
-const desc=
+const description=
 document.createElement("p");
 
-desc.className="desc";
-desc.textContent=
+description.className="desc";
+
+description.textContent=
+cleanSnippet(
 item.description||
 item.snippet||
-"";
+item.snippet_text||
+""
+);
 
-article.append(top,urlNode,desc);
+article.append(
+top,
+urlNode,
+description
+);
+
 results.appendChild(article);
 
 updateStats();
@@ -294,6 +580,7 @@ return true;
 }
 
 function addResults(list){
+
 if(!Array.isArray(list))return;
 
 for(const item of list){
@@ -301,7 +588,15 @@ addResult(item);
 }
 }
 
-function showPanel(data,source){
+function showKnowledge(data,source){
+
+if(
+!data||
+(!data.title&&!data.description)
+){
+return;
+}
+
 panelBody.replaceChildren();
 
 const title=
@@ -311,94 +606,149 @@ title.textContent=
 data.title||
 query;
 
-const src=
+const sourceNode=
 document.createElement("div");
 
-src.className="panelSource";
-src.textContent=source;
+sourceNode.className=
+"panelSource";
 
-panelBody.append(title,src);
+sourceNode.textContent=
+source;
+
+panelBody.append(
+title,
+sourceNode
+);
 
 if(data.image){
 
-const img=
+const image=
 document.createElement("img");
 
-img.src=data.image;
-img.alt="";
-img.loading="eager";
+image.className=
+"panelImage";
 
-img.onerror=()=>{
-img.remove();
+image.loading="eager";
+image.src=data.image;
+image.alt="";
+
+image.onerror=()=>{
+image.remove();
 };
 
-panelBody.appendChild(img);
+panelBody.appendChild(image);
 }
 
 if(data.description){
 
-const p=
+const text=
 document.createElement("p");
 
-p.textContent=data.description;
-panelBody.appendChild(p);
+text.className=
+"panelText";
+
+text.textContent=
+data.description;
+
+panelBody.appendChild(text);
 }
 
 if(data.url){
 
-const a=
+const link=
 document.createElement("a");
 
-a.href=data.url;
-a.target="_blank";
-a.rel="noopener noreferrer";
-a.textContent="Read more";
+link.className=
+"panelLink";
 
-panelBody.appendChild(a);
+link.href=data.url;
+link.target="_blank";
+link.rel="noopener noreferrer";
+link.textContent=
+"Read more";
+
+panelBody.appendChild(link);
 }
 
 panel.classList.add("show");
 }
 
 async function wikipedia(){
+
 try{
+
+const search=
+"https://en.wikipedia.org/w/api.php"+
+"?action=query"+
+"&list=search"+
+"&srsearch="+
+encodeURIComponent(query)+
+"&srlimit=1"+
+"&format=json"+
+"&origin=*";
 
 const response=
 await fetch(
-"https://en.wikipedia.org/api/rest_v1/page/summary/"+
-encodeURIComponent(query),
-{
-headers:{Accept:"application/json"},
-cache:"no-store"
-}
+search,
+{cache:"no-store"}
 );
 
 if(!response.ok)return;
 
-const d=
+const data=
 await response.json();
 
-if(!d.title&&!d.extract)return;
+const match=
+data.query?.search?.[0];
 
-showPanel({
-title:d.title,
-description:d.extract,
-image:d.thumbnail?.source||
-d.originalimage?.source,
-url:d.content_urls?.desktop?.page
+if(!match)return;
+
+const summary=
+"https://en.wikipedia.org/api/rest_v1/page/summary/"+
+encodeURIComponent(match.title);
+
+const result=
+await fetch(
+summary,
+{
+headers:{
+Accept:"application/json"
+},
+cache:"no-store"
+}
+);
+
+if(!result.ok)return;
+
+const page=
+await result.json();
+
+showKnowledge({
+title:page.title,
+description:page.extract,
+image:
+page.thumbnail?.source||
+page.originalimage?.source,
+url:
+page.content_urls?.desktop?.page
 },"Wikipedia");
 
-}catch{}
+}catch(error){
+console.debug("Wikipedia",error);
+}
 }
 
-async function ddg(){
+async function duckDuckGo(){
+
 try{
 
 const response=
 await fetch(
 "https://api.duckduckgo.com/?q="+
 encodeURIComponent(query)+
-"&format=json&no_html=1&skip_disambig=1",
+"&format=json"+
+"&no_html=1"+
+"&skip_disambig=1",
 {
 cache:"no-store"
 }
@@ -406,30 +756,39 @@ cache:"no-store"
 
 if(!response.ok)return;
 
-const d=
+const data=
 await response.json();
 
 if(
-d.AbstractText&&
+data.AbstractText&&
 !panel.classList.contains("show")
 ){
 
-showPanel({
-title:d.Heading||query,
-description:d.AbstractText,
-image:d.Image||"",
-url:d.AbstractURL||""
+showKnowledge({
+title:
+data.Heading||
+query,
+description:
+data.AbstractText,
+image:
+data.Image||
+"",
+url:
+data.AbstractURL||
+""
 },"DuckDuckGo");
 }
 
-}catch{}
+}catch(error){
+console.debug("DDG",error);
+}
 }
 
 function calculator(){
 
-if(!/^[0-9+\-*/().%\s]+$/.test(query)){
-return;
-}
+if(
+!/^[0-9+\-*/().%\s]+$/.test(query)
+)return;
 
 try{
 
@@ -438,7 +797,8 @@ Function(
 "\"use strict\";return("+query+")"
 )();
 
-if(!Number.isFinite(value))return;
+if(!Number.isFinite(value))
+return;
 
 const box=
 document.createElement("div");
@@ -455,73 +815,68 @@ const answer=
 document.createElement("div");
 
 answer.className="toolValue";
-answer.textContent=String(value);
+answer.textContent=
+String(value);
 
 box.append(title,answer);
+
 tools.appendChild(box);
 
 }catch{}
 }
 
-function convert(){
+function conversion(){
 
-const m=
+const match=
 query.match(
 /^(-?[\d.,]+)\s*(km|mi|m|ft|kg|lb|c|f|°c|°f)$/i
 );
 
-if(!m)return;
+if(!match)return;
 
-const n=
-Number(m[1].replace(/,/g,""));
+const number=
+Number(
+match[1].replace(/,/g,"")
+);
 
 const unit=
-m[2].toLowerCase();
+match[2].toLowerCase();
 
-let value;
-let out;
+let output="";
 
-if(unit==="km"){
-value=n*0.621371;
-out=value.toFixed(4)+" mi";
-}
+if(unit==="km")
+output=
+(number*.621371).toFixed(4)+" mi";
 
-if(unit==="mi"){
-value=n*1.609344;
-out=value.toFixed(4)+" km";
-}
+if(unit==="mi")
+output=
+(number*1.609344).toFixed(4)+" km";
 
-if(unit==="m"){
-value=n*3.28084;
-out=value.toFixed(4)+" ft";
-}
+if(unit==="m")
+output=
+(number*3.28084).toFixed(4)+" ft";
 
-if(unit==="ft"){
-value=n*0.3048;
-out=value.toFixed(4)+" m";
-}
+if(unit==="ft")
+output=
+(number*.3048).toFixed(4)+" m";
 
-if(unit==="kg"){
-value=n*2.2046226218;
-out=value.toFixed(4)+" lb";
-}
+if(unit==="kg")
+output=
+(number*2.2046226218).toFixed(4)+" lb";
 
-if(unit==="lb"){
-value=n*0.45359237;
-out=value.toFixed(4)+" kg";
-}
+if(unit==="lb")
+output=
+(number*.45359237).toFixed(4)+" kg";
 
-if(unit==="c"||unit==="°c"){
-value=n*9/5+32;
-out=value.toFixed(2)+" °F";
-}
+if(unit==="c"||unit==="°c")
+output=
+(number*9/5+32).toFixed(2)+" °F";
 
-if(unit==="f"||unit==="°f"){
-value=(n-32)*5/9;
-out=value.toFixed(2)+" °C";
-}
+if(unit==="f"||unit==="°f")
+output=
+((number-32)*5/9).toFixed(2)+" °C";
 
-if(!out)return;
+if(!output)return;
 
 const box=
 document.createElement("div");
@@ -538,23 +893,27 @@ const answer=
 document.createElement("div");
 
 answer.className="toolValue";
-answer.textContent=out;
+answer.textContent=output;
 
 box.append(title,answer);
+
 tools.appendChild(box);
 }
 
 async function weather(){
 
-if(!/\b(weather|temperature|forecast)\b/i.test(query)){
-return;
-}
+if(
+!/^\s*(weather|temperature|forecast)\b/i.test(query)
+)return;
 
 try{
 
 const city=
 query
-.replace(/\b(weather|temperature|forecast)\b/gi,"")
+.replace(
+/^\s*(weather|temperature|forecast)\b/i,
+""
+)
 .trim();
 
 if(!city)return;
@@ -563,14 +922,19 @@ const geo=
 await fetch(
 "https://geocoding-api.open-meteo.com/v1/search?name="+
 encodeURIComponent(city)+
-"&count=1&language=en&format=json"
+"&count=1&language=en&format=json",
+{
+cache:"no-store"
+}
 );
 
-const g=
+if(!geo.ok)return;
+
+const location=
 await geo.json();
 
 const place=
-g.results?.[0];
+location.results?.[0];
 
 if(!place)return;
 
@@ -580,10 +944,15 @@ await fetch(
 place.latitude+
 "&longitude="+
 place.longitude+
-"&current=temperature_2m,weather_code,wind_speed_10m"
+"&current=temperature_2m,wind_speed_10m",
+{
+cache:"no-store"
+}
 );
 
-const d=
+if(!response.ok)return;
+
+const data=
 await response.json();
 
 const box=
@@ -603,9 +972,8 @@ const value=
 document.createElement("div");
 
 value.className="toolValue";
-
 value.textContent=
-d.current.temperature_2m+
+data.current.temperature_2m+
 "°C";
 
 const small=
@@ -615,40 +983,52 @@ small.className="toolSmall";
 
 small.textContent=
 "Wind "+
-d.current.wind_speed_10m+
+data.current.wind_speed_10m+
 " km/h";
 
-box.append(title,value,small);
+box.append(
+title,
+value,
+small
+);
+
 tools.appendChild(box);
 
-}catch{}
+}catch(error){
+console.debug("Weather",error);
+}
 }
 
-async function searchLocal(){
+async function localSearch(){
 
 try{
 
 const response=
 await fetch(
-SUPA+
+SUPABASE+
 "tracebreak-search-fast?q="+
-plusQuery(query)+
+encodeQuery(query)+
 "&limit=100",
 {
-headers:{Accept:"application/json"},
+headers:{
+Accept:"application/json"
+},
 cache:"no-store"
 }
 );
 
 if(!response.ok)return;
 
-const d=
+const data=
 await response.json();
 
-addResults(d.results||[]);
+addResults(
+data.results||
+[]
+);
 
 }catch(error){
-console.debug(error);
+console.debug("TraceBreak",error);
 }
 }
 
@@ -659,23 +1039,29 @@ try{
 const response=
 await fetch(
 "https://api.360-search.com/?q="+
-plusQuery(query)+
-"&type=web&limit=30",
+encodeQuery(query)+
+"&type=web"+
+"&limit=30",
 {
-headers:{Accept:"application/json"},
+headers:{
+Accept:"application/json"
+},
 cache:"no-store"
 }
 );
 
 if(!response.ok)return;
 
-const d=
+const data=
 await response.json();
 
-addResults(d.results||[]);
+addResults(
+data.results||
+[]
+);
 
 }catch(error){
-console.debug("360:",error);
+console.debug("360",error);
 }
 }
 
@@ -685,55 +1071,63 @@ try{
 
 const response=
 await fetch(
-SUPA+
+SUPABASE+
 "tracebreak-meta-fast?provider=you&q="+
-plusQuery(query)+
+encodeQuery(query)+
 "&limit=30",
 {
-headers:{Accept:"application/json"},
+headers:{
+Accept:"application/json"
+},
 cache:"no-store"
 }
 );
 
 if(!response.ok)return;
 
-const d=
+const data=
 await response.json();
 
-addResults(
-d.providers?.you?.results||
-d.you?.results||
-[]
-);
+const list=
+data.providers?.you?.results||
+[];
+
+addResults(list);
 
 }catch(error){
-console.debug("You:",error);
+console.debug("You",error);
 }
 }
 
-async function imagesSearch(){
+async function imageSearch(){
 
 try{
 
 const response=
 await fetch(
 "https://api.360-search.com/?q="+
-plusQuery(query)+
-"&type=image&limit=12",
+encodeQuery(query)+
+"&type=image"+
+"&limit=12",
 {
-headers:{Accept:"application/json"},
+headers:{
+Accept:"application/json"
+},
 cache:"no-store"
 }
 );
 
 if(!response.ok)return;
 
-const d=
+const data=
 await response.json();
 
 const list=
-Array.isArray(d.results)?
-d.results:[];
+Array.isArray(data.results)
+?
+data.results
+:
+[];
 
 if(!list.length)return;
 
@@ -750,21 +1144,25 @@ item.thumbnail;
 
 if(!src)continue;
 
-const img=
+const image=
 document.createElement("img");
 
-img.src=src;
-img.alt=item.title||"";
-img.loading="lazy";
+image.src=src;
+image.alt=
+item.title||
+"";
+image.loading="lazy";
 
-grid.appendChild(img);
+grid.appendChild(image);
 }
 
 if(grid.children.length){
 images.appendChild(grid);
 }
 
-}catch{}
+}catch(error){
+console.debug("Images",error);
+}
 }
 
 function run(){
@@ -777,21 +1175,25 @@ stats.textContent=
 return;
 }
 
+stats.textContent=
+"Searching · "+
+elapsed()+
+" ms";
+
 /*
- * Everything starts independently.
+ * Independent requests.
  * Nothing waits for another provider.
  */
 
-searchLocal();
+localSearch();
 wikipedia();
-ddg();
+duckDuckGo();
 calculator();
-convert();
+conversion();
 weather();
 search360();
-imagesSearch();
+imageSearch();
 searchYou();
-
 }
 
 run();
