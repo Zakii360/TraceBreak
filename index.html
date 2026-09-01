@@ -1,131 +1,1797 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TraceBreak</title>
-  <meta name="description" content="Trace the web, not the user.">
-  <style>
-    :root {
-      color-scheme: light;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #fff;
-      color: #171717;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TraceBreak Search</title>
+<link rel="icon" href="/TraceBreak/favicon.svg">
 
-    * {
-      box-sizing: border-box;
-    }
+<style>
+*{box-sizing:border-box}
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-    }
+html,body{
+margin:0;
+padding:0
+}
 
-    main {
-      width: min(680px, calc(100% - 40px));
-      margin-top: -7vh;
-      text-align: center;
-    }
+body{
+background:#fff;
+color:#202124;
+font-family:Arial,Helvetica,sans-serif
+}
 
-    h1 {
-      margin: 0 0 28px;
-      font-size: clamp(42px, 8vw, 72px);
-      font-weight: 700;
-      letter-spacing: -3px;
-    }
+header{
+position:sticky;
+top:0;
+z-index:20;
+background:rgba(255,255,255,.97);
+border-bottom:1px solid #e5e5e5
+}
 
-    form {
-      display: flex;
-      gap: 10px;
-    }
+.bar{
+width:min(1120px,calc(100% - 32px));
+min-height:66px;
+margin:auto;
+display:flex;
+align-items:center;
+gap:20px
+}
 
-    input {
-      flex: 1;
-      min-width: 0;
-      height: 50px;
-      padding: 0 17px;
-      border: 1px solid #cfcfcf;
-      border-radius: 7px;
-      outline: none;
-      font-size: 16px;
-    }
+.logo{
+font-size:20px;
+font-weight:700;
+letter-spacing:-.7px;
+color:#111;
+text-decoration:none;
+white-space:nowrap
+}
 
-    input:focus {
-      border-color: #777;
-      box-shadow: 0 0 0 3px #0000000c;
-    }
+.searchWrap{
+position:relative;
+width:min(700px,100%);
+flex:1
+}
 
-    button {
-      height: 50px;
-      padding: 0 22px;
-      border: 0;
-      border-radius: 7px;
-      background: #171717;
-      color: #fff;
-      font-size: 15px;
-      cursor: pointer;
-    }
+.search{
+display:flex
+}
 
-    button:hover {
-      background: #303030;
-    }
+.search input{
+width:100%;
+height:40px;
+padding:0 13px;
+border:1px solid #c8c8c8;
+border-right:0;
+border-radius:6px 0 0 6px;
+outline:none;
+font-size:15px
+}
 
-    .tagline {
-      margin: 18px 0 0;
-      color: #777;
-      font-size: 13px;
-    }
+.search input:focus{
+border-color:#777
+}
 
-    @media (max-width: 520px) {
-      form {
-        flex-direction: column;
-      }
+.search button{
+height:40px;
+padding:0 18px;
+border:0;
+border-radius:0 6px 6px 0;
+background:#202124;
+color:#fff;
+cursor:pointer
+}
 
-      button {
-        width: 100%;
-      }
-    }
-  </style>
+.suggestions{
+position:absolute;
+top:44px;
+left:0;
+right:0;
+display:none;
+background:#fff;
+border:1px solid #ddd;
+border-radius:7px;
+overflow:hidden;
+box-shadow:0 8px 25px rgba(0,0,0,.09);
+z-index:100
+}
+
+.suggestions.active{
+display:block
+}
+
+.suggestion{
+display:flex;
+align-items:center;
+gap:10px;
+width:100%;
+padding:10px 13px;
+border:0;
+background:#fff;
+color:#202124;
+font:14px Arial,sans-serif;
+text-align:left;
+cursor:pointer
+}
+
+.suggestion:hover,
+.suggestion.selected{
+background:#f3f3f3
+}
+
+.suggestionIcon{
+width:16px;
+height:16px;
+flex:none;
+opacity:.65
+}
+
+.suggestionText{
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap
+}
+
+.controls{
+display:flex;
+gap:7px
+}
+
+.control{
+height:34px;
+padding:0 11px;
+border:1px solid #ccc;
+border-radius:5px;
+background:#fff;
+color:#333;
+cursor:pointer
+}
+
+.layout{
+width:min(1120px,calc(100% - 32px));
+margin:25px auto 80px;
+display:grid;
+grid-template-columns:minmax(0,750px) 310px;
+gap:50px
+}
+
+.status{
+margin-bottom:12px;
+color:#777;
+font-size:13px
+}
+
+.correction{
+display:none;
+margin:-5px 0 20px;
+font-size:13px;
+color:#555
+}
+
+.correction.active{
+display:block
+}
+
+.correction a{
+color:#1a0dab;
+text-decoration:none
+}
+
+.correction a:hover{
+text-decoration:underline
+}
+
+.result{
+margin-bottom:27px;
+animation:resultIn .12s ease-out
+}
+
+@keyframes resultIn{
+from{
+opacity:0;
+transform:translateY(3px)
+}
+to{
+opacity:1;
+transform:none
+}
+}
+
+.resultHead{
+display:flex;
+align-items:flex-start;
+gap:8px
+}
+
+.favicon{
+width:18px;
+height:18px;
+margin-top:4px;
+object-fit:contain;
+flex:0 0 18px
+}
+
+.resultTitle{
+font-size:18px;
+line-height:1.3;
+color:#1a0dab;
+text-decoration:none
+}
+
+.resultTitle:hover{
+text-decoration:underline
+}
+
+.resultUrl{
+margin:4px 0 4px 26px;
+font-size:13px;
+color:#188038;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis
+}
+
+.resultDesc{
+margin:0 0 0 26px;
+font-size:14px;
+line-height:1.52;
+color:#4d5156
+}
+
+.knowledge{
+display:none;
+align-self:start;
+border-left:1px solid #e3e3e3;
+padding-left:23px
+}
+
+.knowledge.active{
+display:block
+}
+
+.kLabel{
+margin-bottom:11px;
+font-size:11px;
+font-weight:700;
+letter-spacing:.1em;
+color:#777;
+text-transform:uppercase
+}
+
+.knowledge h2{
+margin:0 0 5px;
+font-size:23px
+}
+
+.kSource{
+margin-bottom:13px;
+font-size:12px;
+color:#777
+}
+
+.kImage{
+width:100%;
+max-height:190px;
+object-fit:cover;
+border-radius:6px;
+margin-bottom:13px
+}
+
+.kText{
+margin:0 0 12px;
+font-size:14px;
+line-height:1.55;
+color:#444
+}
+
+.kLink{
+font-size:13px;
+color:#1a0dab;
+text-decoration:none
+}
+
+.tool{
+margin-bottom:17px;
+padding:14px;
+border:1px solid #e2e2e2;
+border-radius:7px
+}
+
+.toolName{
+margin-bottom:7px;
+font-size:12px;
+font-weight:700
+}
+
+.toolValue{
+font-size:22px
+}
+
+.toolInfo{
+margin-top:4px;
+font-size:13px;
+color:#666
+}
+
+.imageGrid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:7px;
+margin-bottom:28px
+}
+
+.imageGrid img{
+width:100%;
+height:105px;
+border-radius:5px;
+object-fit:cover
+}
+
+body.rubmode{
+background:#fff;
+color:#000;
+font-family:"Times New Roman",serif
+}
+
+body.rubmode header{
+position:static;
+background:#fff;
+border:0
+}
+
+body.rubmode .bar{
+width:auto;
+min-height:40px;
+margin:0;
+padding:6px;
+gap:10px
+}
+
+body.rubmode .logo{
+font-family:"Times New Roman",serif;
+font-size:16px;
+font-weight:normal;
+letter-spacing:0
+}
+
+body.rubmode .searchWrap{
+width:auto;
+max-width:none;
+flex:none
+}
+
+body.rubmode .search{
+gap:4px
+}
+
+body.rubmode .search input{
+width:300px;
+height:20px;
+padding:1px 2px;
+border:1px solid #767676;
+border-radius:0;
+font:13.3333px Arial,sans-serif
+}
+
+body.rubmode .search button{
+height:23px;
+padding:1px 6px;
+border:1px solid #767676;
+border-radius:0;
+background:#efefef;
+color:#000;
+font:13.3333px Arial,sans-serif
+}
+
+body.rubmode .control{
+height:23px;
+padding:1px 6px;
+border:1px solid #767676;
+border-radius:0;
+background:#efefef;
+color:#000;
+font:13.3333px Arial,sans-serif
+}
+
+body.rubmode .suggestions{
+top:24px;
+border:1px solid #777;
+border-radius:0;
+box-shadow:none
+}
+
+body.rubmode .suggestion{
+padding:3px 5px;
+font:13.3333px Arial,sans-serif
+}
+
+body.rubmode main{
+width:auto;
+margin:10px 6px 50px;
+display:block
+}
+
+body.rubmode .result{
+margin-bottom:19px
+}
+
+body.rubmode .resultTitle{
+font-family:Arial,Helvetica,sans-serif;
+font-size:16px;
+color:#00e;
+text-decoration:underline
+}
+
+body.rubmode .resultUrl{
+margin-left:24px;
+color:#008000
+}
+
+body.rubmode .resultDesc{
+margin-left:24px;
+color:#000
+}
+
+body.rubmode .knowledge{
+border-left:1px solid #777;
+padding-left:12px
+}
+
+body.rubmode .tool{
+border:1px solid #777;
+border-radius:0;
+padding:7px
+}
+
+body.rubmode .imageGrid img{
+border-radius:0
+}
+
+@media(max-width:850px){
+
+.layout{
+grid-template-columns:1fr
+}
+
+.knowledge{
+border-left:0;
+border-top:1px solid #ddd;
+padding:20px 0 0
+}
+
+}
+
+@media(max-width:650px){
+
+.bar{
+flex-wrap:wrap;
+padding:8px 0
+}
+
+.searchWrap{
+order:3;
+flex-basis:100%
+}
+
+.search input{
+border-right:1px solid #ccc;
+border-radius:6px
+}
+
+.search button{
+display:none
+}
+
+.imageGrid{
+grid-template-columns:repeat(2,1fr)
+}
+
+body.rubmode .searchWrap{
+order:initial;
+flex:none
+}
+
+body.rubmode .search input{
+width:220px
+}
+
+}
+</style>
 </head>
+
 <body>
-  <main>
-    <h1>TraceBreak</h1>
 
-    <form id="search">
-      <input
-        id="query"
-        name="q"
-        type="search"
-        placeholder="Search the web"
-        autocomplete="off"
-        autofocus
-      >
-      <button type="submit">Search</button>
-    </form>
+<header>
+<div class="bar">
 
-    <p class="tagline">Trace the web, not the user.</p>
-  </main>
+<a class="logo" href="/TraceBreak/">TraceBreak</a>
 
-  <script>
-    const form = document.getElementById("search");
-    const input = document.getElementById("query");
+<div class="searchWrap">
 
-    form.addEventListener("submit", event => {
-      event.preventDefault();
+<form class="search" id="searchForm">
 
-      const value = input.value.trim();
+<input
+id="queryInput"
+type="search"
+autocomplete="off"
+spellcheck="false"
+aria-label="Search"
+>
 
-      if (!value) {
-        return;
-      }
+<button type="submit">Search</button>
 
-      const query = value.split(/\s+/).join("+");
+</form>
 
-      location.href = "https://zakii360.github.io/TraceBreak/search?q=" + query;
-    });
-  </script>
+<div
+class="suggestions"
+id="suggestions"
+role="listbox"
+></div>
+
+</div>
+
+<div class="controls">
+
+<button
+class="control"
+id="rubToggle"
+type="button"
+>
+RubMode
+</button>
+
+</div>
+
+</div>
+</header>
+
+<main class="layout">
+
+<section>
+
+<div id="status" class="status">
+Searching...
+</div>
+
+<div id="correction" class="correction"></div>
+
+<div id="tools"></div>
+
+<div id="images"></div>
+
+<div id="results"></div>
+
+</section>
+
+<aside id="knowledge" class="knowledge">
+
+<div class="kLabel">Knowledge</div>
+
+<div id="knowledgeBody"></div>
+
+</aside>
+
+</main>
+
+<script>
+const BASE="/TraceBreak/";
+const SUPABASE="https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/";
+
+const params=new URLSearchParams(location.search);
+const query=(params.get("q")||"").trim();
+
+const input=document.getElementById("queryInput");
+const suggestions=document.getElementById("suggestions");
+const status=document.getElementById("status");
+const correction=document.getElementById("correction");
+const results=document.getElementById("results");
+const tools=document.getElementById("tools");
+const images=document.getElementById("images");
+const knowledge=document.getElementById("knowledge");
+const knowledgeBody=document.getElementById("knowledgeBody");
+const searchForm=document.getElementById("searchForm");
+const rubToggle=document.getElementById("rubToggle");
+
+const started=performance.now();
+
+let seen=new Set();
+let suggestionTimer=null;
+let suggestionIndex=-1;
+let suggestionAbort=null;
+
+input.value=query;
+
+function encodeQuery(value){
+
+const text=value.trim();
+
+if(text.includes("+")){
+return encodeURIComponent(text).replace(/%20/g,"+");
+}
+
+return text
+.split(/\s+/)
+.map(encodeURIComponent)
+.join("+");
+}
+
+function search(value){
+
+value=value.trim();
+
+if(!value)return;
+
+location.href=
+BASE+
+"search.html?q="+
+encodeQuery(value);
+}
+
+searchForm.addEventListener("submit",e=>{
+
+e.preventDefault();
+search(input.value);
+
+});
+
+function scoreSuggestion(value,q){
+
+const a=value.toLowerCase().trim();
+const b=q.toLowerCase().trim();
+
+if(!a||!b)return-999;
+
+let score=0;
+
+if(a===b)score+=1000;
+
+if(a.startsWith(b))score+=300;
+
+if(a.includes(b))score+=120;
+
+const aw=a.split(/\s+/);
+const bw=b.split(/\s+/);
+
+let matching=0;
+
+for(const word of bw){
+
+if(aw.includes(word)){
+matching++;
+score+=70;
+}
+
+}
+
+score+=matching*25;
+
+const distance=Math.abs(a.length-b.length);
+
+score-=distance*.4;
+
+return score;
+}
+
+function localSuggestions(q){
+
+const words=q
+.toLowerCase()
+.split(/\s+/)
+.filter(Boolean);
+
+if(!words.length)return[];
+
+const out=[];
+
+function add(value){
+if(value&&value.trim())out.push(value.trim());
+}
+
+add(q);
+
+if(words.length===1){
+
+const w=words[0];
+
+add(w+" wikipedia");
+add(w+" definition");
+add(w+" history");
+
+if(
+/^(math|algebra|geometry|calculus|physics|chemistry)$/i
+.test(w)
+){
+
+add(w+" calculator");
+add(w+" equations");
+add(w+" formulas");
+
+}
+
+if(
+/^(weather|temperature|forecast)$/i
+.test(w)
+){
+
+add("weather today");
+add("weather tomorrow");
+add("weather near me");
+
+}
+
+if(
+/^(google|microsoft|apple|amazon|facebook|youtube)$/i
+.test(w)
+){
+
+add(w+" official");
+add(w+" news");
+add(w+" history");
+
+}
+
+}else{
+
+if(words.length>=2){
+
+add(words.join(" ")+" wikipedia");
+
+}
+
+if(
+/^(what|who|where|when|why|how)$/i.test(words[0])
+){
+
+add(q+"?");
+add(q+" definition");
+
+}
+
+if(
+/\bweather\b/i.test(q)
+){
+
+add(q+" forecast");
+
+}
+
+if(
+/\bnews\b/i.test(q)
+){
+
+add(q+" latest");
+
+}
+
+}
+
+return[...new Set(out)];
+}
+
+async function wikipediaSuggestions(q,signal){
+
+try{
+
+const r=await fetch(
+"https://en.wikipedia.org/w/api.php"+
+"?action=query"+
+"&list=search"+
+"&srsearch="+
+encodeURIComponent(q)+
+"&srlimit=8"+
+"&srnamespace=0"+
+"&format=json"+
+"&origin=*",
+{
+signal,
+cache:"no-store"
+}
+);
+
+if(!r.ok)return[];
+
+const d=await r.json();
+
+return(d.query?.search||[])
+.map(x=>x.title)
+.filter(Boolean);
+
+}catch(e){
+
+if(e.name!=="AbortError"){
+console.debug("Wikipedia suggestions",e);
+}
+
+return[];
+}
+}
+
+function renderSuggestions(list){
+
+suggestions.replaceChildren();
+suggestionIndex=-1;
+
+if(!list.length){
+
+suggestions.classList.remove("active");
+return;
+}
+
+for(const value of list){
+
+const button=document.createElement("button");
+
+button.type="button";
+button.className="suggestion";
+button.setAttribute("role","option");
+
+const icon=document.createElement("span");
+icon.className="suggestionIcon";
+icon.textContent="⌕";
+
+const text=document.createElement("span");
+text.className="suggestionText";
+text.textContent=value;
+
+button.append(icon,text);
+
+button.addEventListener("mousedown",e=>{
+
+e.preventDefault();
+search(value);
+
+});
+
+suggestions.appendChild(button);
+
+}
+
+suggestions.classList.add("active");
+}
+
+async function updateSuggestions(){
+
+const q=input.value.trim();
+
+if(!q){
+
+suggestions.classList.remove("active");
+return;
+}
+
+if(suggestionAbort){
+suggestionAbort.abort();
+}
+
+suggestionAbort=new AbortController();
+
+const local=localSuggestions(q);
+
+renderSuggestions(local);
+
+const wiki=
+await wikipediaSuggestions(
+q,
+suggestionAbort.signal
+);
+
+if(!input.value.trim()===q)return;
+
+const merged=[
+...local,
+...wiki
+];
+
+const unique=[
+...new Map(
+merged.map(x=>[
+x.toLowerCase().trim(),
+x
+])
+.values()
+];
+
+unique.sort(
+(a,b)=>
+scoreSuggestion(b,q)-
+scoreSuggestion(a,q)
+);
+
+renderSuggestions(
+unique.slice(0,8)
+);
+}
+
+input.addEventListener("input",()=>{
+
+clearTimeout(suggestionTimer);
+
+suggestionTimer=setTimeout(
+updateSuggestions,
+180
+);
+
+});
+
+input.addEventListener("focus",()=>{
+
+if(input.value.trim()){
+updateSuggestions();
+}
+
+});
+
+input.addEventListener("keydown",e=>{
+
+const items=[
+...suggestions.querySelectorAll(".suggestion")
+];
+
+if(!items.length)return;
+
+if(e.key==="ArrowDown"){
+
+e.preventDefault();
+
+suggestionIndex=
+(suggestionIndex+1)%items.length;
+
+items.forEach(x=>
+x.classList.remove("selected")
+);
+
+items[suggestionIndex].classList.add("selected");
+
+input.value=
+items[suggestionIndex]
+.querySelector(".suggestionText")
+.textContent;
+
+}
+
+if(e.key==="ArrowUp"){
+
+e.preventDefault();
+
+suggestionIndex=
+suggestionIndex<=0?
+items.length-1:
+suggestionIndex-1;
+
+items.forEach(x=>
+x.classList.remove("selected")
+);
+
+items[suggestionIndex].classList.add("selected");
+
+input.value=
+items[suggestionIndex]
+.querySelector(".suggestionText")
+.textContent;
+
+}
+
+if(e.key==="Enter"&&suggestionIndex>=0){
+
+e.preventDefault();
+
+search(
+items[suggestionIndex]
+.querySelector(".suggestionText")
+.textContent
+);
+
+}
+
+if(e.key==="Escape"){
+
+suggestions.classList.remove("active");
+
+}
+
+});
+
+document.addEventListener("click",e=>{
+
+if(!e.target.closest(".searchWrap")){
+suggestions.classList.remove("active");
+}
+
+});
+
+rubToggle.addEventListener("click",()=>{
+
+const on=
+document.body.classList.toggle("rubmode");
+
+rubToggle.textContent=
+on?
+"NormalMode":
+"RubMode";
+
+localStorage.setItem(
+"tracebreak-rubmode",
+on?"1":"0"
+);
+
+});
+
+if(
+localStorage.getItem("tracebreak-rubmode")==="1"
+){
+
+document.body.classList.add("rubmode");
+rubToggle.textContent="NormalMode";
+
+}
+
+function elapsed(){
+
+return Math.round(
+performance.now()-started
+);
+
+}
+
+function updateStatus(){
+
+const count=
+document.querySelectorAll(".result").length;
+
+status.textContent=
+count+
+(count===1?" result":" results")+
+" · "+
+elapsed()+
+" ms";
+
+}
+
+function canonical(url){
+
+try{
+
+const u=new URL(url);
+
+u.hash="";
+
+[
+"utm_source",
+"utm_medium",
+"utm_campaign",
+"utm_term",
+"utm_content",
+"gclid",
+"fbclid",
+"msclkid",
+"dclid"
+].forEach(k=>
+u.searchParams.delete(k)
+);
+
+return u.toString();
+
+}catch{
+
+return String(url);
+
+}
+
+}
+
+function makeFavicon(url){
+
+try{
+
+const u=new URL(url);
+
+const img=document.createElement("img");
+
+img.className="favicon";
+img.alt="";
+img.loading="lazy";
+img.src=u.origin+"/favicon.ico";
+
+img.onerror=()=>{
+
+if(img.dataset.fallback)return;
+
+img.dataset.fallback="1";
+
+img.src=
+"https://www.google.com/s2/favicons?sz=32&domain_url="+
+encodeURIComponent(url);
+
+};
+
+return img;
+
+}catch{
+
+return null;
+
+}
+
+}
+
+function cleanDescription(value){
+
+return String(value||"")
+.replace(/\s+/g," ")
+.replace(
+/^(summary|highlights|notes|overview|description)\s*:\s*/i,
+""
+)
+.trim()
+.slice(0,340)
+.replace(/\s+\S*$/,"");
+
+}
+
+function addResult(item){
+
+if(!item)return;
+
+const url=
+item.url||
+item.link||
+item.href;
+
+if(!url)return;
+
+const key=canonical(url);
+
+if(seen.has(key))return;
+
+seen.add(key);
+
+const article=document.createElement("article");
+article.className="result";
+
+const head=document.createElement("div");
+head.className="resultHead";
+
+const icon=
+item.favicon?
+Object.assign(
+document.createElement("img"),
+{
+className:"favicon",
+alt:"",
+loading:"lazy",
+src:item.favicon
+}
+):
+makeFavicon(url);
+
+if(icon)head.appendChild(icon);
+
+const title=document.createElement("a");
+
+title.className="resultTitle";
+title.href=url;
+title.target="_blank";
+title.rel="noopener noreferrer";
+title.textContent=
+item.title||
+item.name||
+url;
+
+head.appendChild(title);
+
+const urlNode=document.createElement("div");
+
+urlNode.className="resultUrl";
+urlNode.textContent=url;
+
+const desc=document.createElement("p");
+
+desc.className="resultDesc";
+desc.textContent=
+cleanDescription(
+item.description||
+item.snippet||
+item.snippet_text
+);
+
+article.append(
+head,
+urlNode,
+desc
+);
+
+results.appendChild(article);
+
+updateStatus();
+
+}
+
+function addResults(list){
+
+if(!Array.isArray(list))return;
+
+for(const item of list){
+addResult(item);
+}
+
+}
+
+function showCorrection(value){
+
+if(
+!value||
+value.trim().toLowerCase()===
+query.trim().toLowerCase()
+)return;
+
+correction.replaceChildren();
+
+const text=document.createTextNode(
+"Showing results for "
+);
+
+const link=document.createElement("a");
+
+link.href=
+BASE+
+"search.html?q="+
+encodeQuery(value);
+
+link.textContent=value;
+
+correction.append(text,link);
+correction.classList.add("active");
+
+}
+
+function handleCorrection(data){
+
+const value=
+data?.corrected_query||
+data?.did_you_mean||
+data?.suggestion||
+data?.spellcheck;
+
+if(typeof value==="string"){
+showCorrection(value);
+}
+
+}
+
+function showKnowledge(data,source){
+
+if(
+!data||
+(!data.title&&!data.description)
+)return;
+
+knowledgeBody.replaceChildren();
+
+const title=document.createElement("h2");
+title.textContent=data.title||query;
+
+const sourceNode=document.createElement("div");
+sourceNode.className="kSource";
+sourceNode.textContent=source;
+
+knowledgeBody.append(
+title,
+sourceNode
+);
+
+if(data.image){
+
+const img=document.createElement("img");
+
+img.className="kImage";
+img.src=data.image;
+img.alt="";
+img.loading="eager";
+
+img.onerror=()=>img.remove();
+
+knowledgeBody.appendChild(img);
+
+}
+
+if(data.description){
+
+const text=document.createElement("p");
+
+text.className="kText";
+text.textContent=data.description;
+
+knowledgeBody.appendChild(text);
+
+}
+
+if(data.url){
+
+const link=document.createElement("a");
+
+link.className="kLink";
+link.href=data.url;
+link.target="_blank";
+link.rel="noopener noreferrer";
+link.textContent="Read more";
+
+knowledgeBody.appendChild(link);
+
+}
+
+knowledge.classList.add("active");
+
+}
+
+async function loadWikipedia(){
+
+try{
+
+const searchResponse=await fetch(
+"https://en.wikipedia.org/w/api.php"+
+"?action=query"+
+"&list=search"+
+"&srsearch="+
+encodeURIComponent(query)+
+"&srlimit=1"+
+"&srnamespace=0"+
+"&format=json"+
+"&origin=*",
+{cache:"no-store"}
+);
+
+if(!searchResponse.ok)return;
+
+const searchData=
+await searchResponse.json();
+
+const match=
+searchData.query?.search?.[0];
+
+if(!match)return;
+
+const pageResponse=await fetch(
+"https://en.wikipedia.org/api/rest_v1/page/summary/"+
+encodeURIComponent(match.title),
+{
+headers:{
+Accept:"application/json"
+},
+cache:"no-store"
+}
+);
+
+if(!pageResponse.ok)return;
+
+const data=
+await pageResponse.json();
+
+showKnowledge({
+title:data.title,
+description:data.extract,
+image:
+data.thumbnail?.source||
+data.originalimage?.source,
+url:data.content_urls?.desktop?.page
+},"Wikipedia");
+
+}catch(e){
+
+console.debug("Wikipedia",e);
+
+}
+
+}
+
+async function loadDDG(){
+
+try{
+
+const response=await fetch(
+"https://api.duckduckgo.com/?q="+
+encodeURIComponent(query)+
+"&format=json"+
+"&no_html=1"+
+"&skip_disambig=1",
+{
+cache:"no-store"
+}
+);
+
+if(!response.ok)return;
+
+const data=
+await response.json();
+
+if(
+data.AbstractText&&
+!knowledge.classList.contains("active")
+){
+
+showKnowledge({
+title:data.Heading||query,
+description:data.AbstractText,
+image:data.Image,
+url:data.AbstractURL
+},"DuckDuckGo");
+
+}
+
+}catch(e){
+
+console.debug("DuckDuckGo",e);
+
+}
+
+}
+
+function addTool(name,value,info){
+
+const box=document.createElement("div");
+box.className="tool";
+
+const title=document.createElement("div");
+title.className="toolName";
+title.textContent=name;
+
+const result=document.createElement("div");
+result.className="toolValue";
+result.textContent=value;
+
+box.append(title,result);
+
+if(info){
+
+const detail=document.createElement("div");
+detail.className="toolInfo";
+detail.textContent=info;
+
+box.appendChild(detail);
+
+}
+
+tools.appendChild(box);
+
+}
+
+function calculator(){
+
+if(
+!/^[0-9+\-*/().%\s]+$/.test(query)
+)return;
+
+if(!/[+\-*/%]/.test(query))
+return;
+
+try{
+
+const value=
+Function(
+"\"use strict\";return("+query+")"
+)();
+
+if(!Number.isFinite(value))
+return;
+
+addTool(
+"Calculator",
+String(value)
+);
+
+}catch{}
+
+}
+
+function conversion(){
+
+const match=query.match(
+/^(-?[\d.,]+)\s*(km|mi|m|ft|kg|lb|g|oz|c|f|°c|°f)$/i
+);
+
+if(!match)return;
+
+const n=Number(
+match[1].replace(/,/g,"")
+);
+
+const u=match[2].toLowerCase();
+
+let output="";
+
+if(u==="km")
+output=(n*.621371).toFixed(4)+" mi";
+
+else if(u==="mi")
+output=(n*1.609344).toFixed(4)+" km";
+
+else if(u==="m")
+output=(n*3.28084).toFixed(4)+" ft";
+
+else if(u==="ft")
+output=(n*.3048).toFixed(4)+" m";
+
+else if(u==="kg")
+output=(n*2.2046226218).toFixed(4)+" lb";
+
+else if(u==="lb")
+output=(n*.45359237).toFixed(4)+" kg";
+
+else if(u==="g")
+output=(n*.035273962).toFixed(4)+" oz";
+
+else if(u==="oz")
+output=(n*28.349523125).toFixed(4)+" g";
+
+else if(u==="c"||u==="°c")
+output=(n*9/5+32).toFixed(2)+" °F";
+
+else if(u==="f"||u==="°f")
+output=((n-32)*5/9).toFixed(2)+" °C";
+
+if(output){
+addTool("Conversion",output);
+}
+
+}
+
+async function weather(){
+
+const match=query.match(
+/^(?:weather|temperature|forecast)\s+(?:in|for|at)\s+(.+)$/i
+);
+
+if(!match)return;
+
+try{
+
+const geo=await fetch(
+"https://geocoding-api.open-meteo.com/v1/search?name="+
+encodeURIComponent(match[1])+
+"&count=1&language=en&format=json",
+{cache:"no-store"}
+);
+
+if(!geo.ok)return;
+
+const geoData=await geo.json();
+const place=geoData.results?.[0];
+
+if(!place)return;
+
+const response=await fetch(
+"https://api.open-meteo.com/v1/forecast"+
+"?latitude="+
+place.latitude+
+"&longitude="+
+place.longitude+
+"&current=temperature_2m,wind_speed_10m",
+{cache:"no-store"}
+);
+
+if(!response.ok)return;
+
+const data=await response.json();
+
+addTool(
+"Weather · "+place.name,
+Math.round(data.current.temperature_2m)+"°C",
+"Wind "+
+Math.round(data.current.wind_speed_10m)+
+" km/h"
+);
+
+}catch(e){
+
+console.debug("Weather",e);
+
+}
+
+}
+
+async function tracebreak(){
+
+try{
+
+const response=await fetch(
+SUPABASE+
+"tracebreak-search-fast?q="+
+encodeQuery(query)+
+"&limit=100",
+{
+headers:{
+Accept:"application/json"
+},
+cache:"no-store"
+}
+);
+
+if(!response.ok)return;
+
+const data=await response.json();
+
+handleCorrection(data);
+addResults(data.results||[]);
+
+}catch(e){
+
+console.debug("TraceBreak",e);
+
+}
+
+}
+
+async function search360(){
+
+try{
+
+const response=await fetch(
+"https://api.360-search.com/?q="+
+encodeQuery(query)+
+"&type=web"+
+"&safe=moderate"+
+"&limit=30",
+{
+headers:{
+Accept:"application/json"
+},
+cache:"no-store"
+}
+);
+
+if(!response.ok)return;
+
+const data=await response.json();
+
+addResults(data.results||[]);
+
+}catch(e){
+
+console.debug("360 Search",e);
+
+}
+
+}
+
+async function you(){
+
+try{
+
+const response=await fetch(
+SUPABASE+
+"tracebreak-meta-fast?provider=you"+
+"&q="+
+encodeQuery(query)+
+"&limit=30",
+{
+headers:{
+Accept:"application/json"
+},
+cache:"no-store"
+}
+);
+
+if(!response.ok)return;
+
+const data=await response.json();
+
+const provider=data.providers?.you;
+
+if(provider){
+
+addResults(
+provider.results||
+provider.web||
+[]
+);
+
+}
+
+}catch(e){
+
+console.debug("You",e);
+
+}
+
+}
+
+async function imagesSearch(){
+
+try{
+
+const response=await fetch(
+"https://api.360-search.com/?q="+
+encodeQuery(query)+
+"&type=image"+
+"&safe=moderate"+
+"&limit=12",
+{
+headers:{
+Accept:"application/json"
+},
+cache:"no-store"
+}
+);
+
+if(!response.ok)return;
+
+const data=await response.json();
+
+const list=
+Array.isArray(data.results)?
+data.results:
+[];
+
+if(!list.length)return;
+
+const grid=document.createElement("div");
+grid.className="imageGrid";
+
+for(const item of list){
+
+const src=
+item.image||
+item.thumbnail;
+
+if(!src)continue;
+
+const img=document.createElement("img");
+
+img.src=src;
+img.alt=item.title||"";
+img.loading="lazy";
+
+img.onerror=()=>img.remove();
+
+grid.appendChild(img);
+
+}
+
+if(grid.children.length){
+images.appendChild(grid);
+}
+
+}catch(e){
+
+console.debug("Images",e);
+
+}
+
+}
+
+function run(){
+
+if(!query){
+
+status.textContent=
+"Enter a search query.";
+
+return;
+
+}
+
+status.textContent=
+"Searching · "+
+elapsed()+
+" ms";
+
+tracebreak();
+
+loadWikipedia();
+loadDDG();
+
+calculator();
+conversion();
+weather();
+
+search360();
+imagesSearch();
+you();
+
+updateStatus();
+
+}
+
+run();
+</script>
+
 </body>
 </html>
