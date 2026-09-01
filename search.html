@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TraceBreak</title>
+<title>TraceBreak Search</title>
 <link rel="icon" href="/TraceBreak/favicon.svg">
 
 <style>
@@ -24,7 +24,7 @@ header{
 position:sticky;
 top:0;
 z-index:20;
-background:rgba(255,255,255,.96);
+background:rgba(255,255,255,.97);
 border-bottom:1px solid #e5e5e5
 }
 
@@ -100,7 +100,9 @@ display:block
 }
 
 .suggestion{
-display:block;
+display:flex;
+align-items:center;
+gap:10px;
 width:100%;
 padding:10px 13px;
 border:0;
@@ -114,6 +116,19 @@ cursor:pointer
 .suggestion:hover,
 .suggestion.selected{
 background:#f3f3f3
+}
+
+.suggestionIcon{
+width:16px;
+height:16px;
+flex:none;
+opacity:.65
+}
+
+.suggestionText{
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap
 }
 
 .controls{
@@ -131,26 +146,6 @@ color:#333;
 cursor:pointer
 }
 
-.queryCorrection{
-display:none;
-margin:-7px 0 21px;
-font-size:13px;
-color:#555
-}
-
-.queryCorrection.active{
-display:block
-}
-
-.queryCorrection a{
-color:#1a0dab;
-text-decoration:none
-}
-
-.queryCorrection a:hover{
-text-decoration:underline
-}
-
 .layout{
 width:min(1120px,calc(100% - 32px));
 margin:25px auto 80px;
@@ -163,6 +158,26 @@ gap:50px
 margin-bottom:12px;
 color:#777;
 font-size:13px
+}
+
+.correction{
+display:none;
+margin:-5px 0 20px;
+font-size:13px;
+color:#555
+}
+
+.correction.active{
+display:block
+}
+
+.correction a{
+color:#1a0dab;
+text-decoration:none
+}
+
+.correction a:hover{
+text-decoration:underline
 }
 
 .result{
@@ -311,8 +326,6 @@ border-radius:5px;
 object-fit:cover
 }
 
-/* RubMode */
-
 body.rubmode{
 background:#fff;
 color:#000;
@@ -347,7 +360,6 @@ flex:none
 }
 
 body.rubmode .search{
-display:flex;
 gap:4px
 }
 
@@ -357,8 +369,7 @@ height:20px;
 padding:1px 2px;
 border:1px solid #767676;
 border-radius:0;
-font:13.3333px Arial,sans-serif;
-outline:none
+font:13.3333px Arial,sans-serif
 }
 
 body.rubmode .search button{
@@ -397,15 +408,6 @@ body.rubmode main{
 width:auto;
 margin:10px 6px 50px;
 display:block
-}
-
-body.rubmode .status{
-color:#333
-}
-
-body.rubmode .queryCorrection{
-margin-bottom:14px;
-color:#000
 }
 
 body.rubmode .result{
@@ -499,7 +501,6 @@ width:220px
 <body>
 
 <header>
-
 <div class="bar">
 
 <a class="logo" href="/TraceBreak/">TraceBreak</a>
@@ -507,6 +508,7 @@ width:220px
 <div class="searchWrap">
 
 <form class="search" id="searchForm">
+
 <input
 id="queryInput"
 type="search"
@@ -514,36 +516,53 @@ autocomplete="off"
 spellcheck="false"
 aria-label="Search"
 >
+
 <button type="submit">Search</button>
+
 </form>
 
-<div class="suggestions" id="suggestions"></div>
+<div
+class="suggestions"
+id="suggestions"
+role="listbox"
+></div>
 
 </div>
 
 <div class="controls">
-<button class="control" id="rubToggle" type="button">RubMode</button>
-</div>
+
+<button
+class="control"
+id="rubToggle"
+type="button"
+>
+RubMode
+</button>
 
 </div>
 
+</div>
 </header>
 
 <main class="layout">
 
 <section>
 
-<div class="status" id="status">Searching...</div>
+<div id="status" class="status">
+Searching...
+</div>
 
-<div class="queryCorrection" id="correction"></div>
+<div id="correction" class="correction"></div>
 
 <div id="tools"></div>
+
 <div id="images"></div>
+
 <div id="results"></div>
 
 </section>
 
-<aside class="knowledge" id="knowledge">
+<aside id="knowledge" class="knowledge">
 
 <div class="kLabel">Knowledge</div>
 
@@ -561,22 +580,23 @@ const params=new URLSearchParams(location.search);
 const query=(params.get("q")||"").trim();
 
 const input=document.getElementById("queryInput");
+const suggestions=document.getElementById("suggestions");
 const status=document.getElementById("status");
 const correction=document.getElementById("correction");
-const suggestions=document.getElementById("suggestions");
 const results=document.getElementById("results");
 const tools=document.getElementById("tools");
 const images=document.getElementById("images");
 const knowledge=document.getElementById("knowledge");
 const knowledgeBody=document.getElementById("knowledgeBody");
-const rubToggle=document.getElementById("rubToggle");
 const searchForm=document.getElementById("searchForm");
+const rubToggle=document.getElementById("rubToggle");
 
-const seen=new Set();
 const started=performance.now();
 
+let seen=new Set();
+let suggestionTimer=null;
 let suggestionIndex=-1;
-let correctedQuery="";
+let suggestionAbort=null;
 
 input.value=query;
 
@@ -594,7 +614,7 @@ return text
 .join("+");
 }
 
-function goSearch(value){
+function search(value){
 
 value=value.trim();
 
@@ -609,84 +629,183 @@ encodeQuery(value);
 searchForm.addEventListener("submit",e=>{
 
 e.preventDefault();
+search(input.value);
 
-goSearch(input.value);
 });
 
-function querySuggestions(value){
+function scoreSuggestion(value,q){
 
-const q=value.trim();
+const a=value.toLowerCase().trim();
+const b=q.toLowerCase().trim();
 
-if(!q)return [];
+if(!a||!b)return-999;
 
-const words=q.split(/\s+/).filter(Boolean);
+let score=0;
 
-const out=[
-q,
-q+" news",
-q+" wikipedia",
-q+" definition"
-];
+if(a===b)score+=1000;
+
+if(a.startsWith(b))score+=300;
+
+if(a.includes(b))score+=120;
+
+const aw=a.split(/\s+/);
+const bw=b.split(/\s+/);
+
+let matching=0;
+
+for(const word of bw){
+
+if(aw.includes(word)){
+matching++;
+score+=70;
+}
+
+}
+
+score+=matching*25;
+
+const distance=Math.abs(a.length-b.length);
+
+score-=distance*.4;
+
+return score;
+}
+
+function localSuggestions(q){
+
+const words=q
+.toLowerCase()
+.split(/\s+/)
+.filter(Boolean);
+
+if(!words.length)return[];
+
+const out=[];
+
+function add(value){
+if(value&&value.trim())out.push(value.trim());
+}
+
+add(q);
 
 if(words.length===1){
 
-const word=words[0];
+const w=words[0];
 
-out.push(
-word+" meaning",
-word+" history",
-word+" latest"
-);
+add(w+" wikipedia");
+add(w+" definition");
+add(w+" history");
 
 if(
-/^(math|algebra|geometry|calculus|physics)$/i.test(word)
+/^(math|algebra|geometry|calculus|physics|chemistry)$/i
+.test(w)
 ){
-out.push(
-word+" calculator",
-word+" equations",
-word+" formulas"
-);
-}
 
-if(
-/^(trump|biden|president)$/i.test(word)
-){
-out.push(
-word+" news",
-word+" latest",
-word+" biography"
-);
-}
+add(w+" calculator");
+add(w+" equations");
+add(w+" formulas");
 
 }
 
 if(
-/^(weather|temperature|forecast)$/i.test(q)
+/^(weather|temperature|forecast)$/i
+.test(w)
 ){
-out.push(
-"weather today",
-"weather tomorrow",
-"weather near me"
-);
+
+add("weather today");
+add("weather tomorrow");
+add("weather near me");
+
 }
 
 if(
-/^is\s+school\b/i.test(q)
+/^(google|microsoft|apple|amazon|facebook|youtube)$/i
+.test(w)
 ){
-out.push(
-q+" today",
-q+" tomorrow",
-"school calendar"
+
+add(w+" official");
+add(w+" news");
+add(w+" history");
+
+}
+
+}else{
+
+if(words.length>=2){
+
+add(words.join(" ")+" wikipedia");
+
+}
+
+if(
+/^(what|who|where|when|why|how)$/i.test(words[0])
+){
+
+add(q+"?");
+add(q+" definition");
+
+}
+
+if(
+/\bweather\b/i.test(q)
+){
+
+add(q+" forecast");
+
+}
+
+if(
+/\bnews\b/i.test(q)
+){
+
+add(q+" latest");
+
+}
+
+}
+
+return[...new Set(out)];
+}
+
+async function wikipediaSuggestions(q,signal){
+
+try{
+
+const r=await fetch(
+"https://en.wikipedia.org/w/api.php"+
+"?action=query"+
+"&list=search"+
+"&srsearch="+
+encodeURIComponent(q)+
+"&srlimit=8"+
+"&srnamespace=0"+
+"&format=json"+
+"&origin=*",
+{
+signal,
+cache:"no-store"
+}
 );
+
+if(!r.ok)return[];
+
+const d=await r.json();
+
+return(d.query?.search||[])
+.map(x=>x.title)
+.filter(Boolean);
+
+}catch(e){
+
+if(e.name!=="AbortError"){
+console.debug("Wikipedia suggestions",e);
 }
 
-return [...new Set(out)].slice(0,7);
+return[];
+}
 }
 
-function renderSuggestions(){
-
-const list=
-querySuggestions(input.value);
+function renderSuggestions(list){
 
 suggestions.replaceChildren();
 suggestionIndex=-1;
@@ -703,28 +822,109 @@ const button=document.createElement("button");
 
 button.type="button";
 button.className="suggestion";
-button.textContent=value;
+button.setAttribute("role","option");
+
+const icon=document.createElement("span");
+icon.className="suggestionIcon";
+icon.textContent="⌕";
+
+const text=document.createElement("span");
+text.className="suggestionText";
+text.textContent=value;
+
+button.append(icon,text);
 
 button.addEventListener("mousedown",e=>{
+
 e.preventDefault();
-goSearch(value);
+search(value);
+
 });
 
 suggestions.appendChild(button);
+
 }
 
 suggestions.classList.add("active");
 }
 
+async function updateSuggestions(){
+
+const q=input.value.trim();
+
+if(!q){
+
+suggestions.classList.remove("active");
+return;
+}
+
+if(suggestionAbort){
+suggestionAbort.abort();
+}
+
+suggestionAbort=new AbortController();
+
+const local=localSuggestions(q);
+
+renderSuggestions(local);
+
+const wiki=
+await wikipediaSuggestions(
+q,
+suggestionAbort.signal
+);
+
+if(!input.value.trim()===q)return;
+
+const merged=[
+...local,
+...wiki
+];
+
+const unique=[
+...new Map(
+merged.map(x=>[
+x.toLowerCase().trim(),
+x
+])
+.values()
+];
+
+unique.sort(
+(a,b)=>
+scoreSuggestion(b,q)-
+scoreSuggestion(a,q)
+);
+
+renderSuggestions(
+unique.slice(0,8)
+);
+}
+
 input.addEventListener("input",()=>{
 
-renderSuggestions();
+clearTimeout(suggestionTimer);
+
+suggestionTimer=setTimeout(
+updateSuggestions,
+180
+);
+
+});
+
+input.addEventListener("focus",()=>{
+
+if(input.value.trim()){
+updateSuggestions();
+}
+
 });
 
 input.addEventListener("keydown",e=>{
 
-const items=
-[...suggestions.querySelectorAll(".suggestion")];
+const items=[
+...suggestions.querySelectorAll(".suggestion")
+];
 
 if(!items.length)return;
 
@@ -742,7 +942,9 @@ x.classList.remove("selected")
 items[suggestionIndex].classList.add("selected");
 
 input.value=
-items[suggestionIndex].textContent;
+items[suggestionIndex]
+.querySelector(".suggestionText")
+.textContent;
 
 }
 
@@ -762,7 +964,21 @@ x.classList.remove("selected")
 items[suggestionIndex].classList.add("selected");
 
 input.value=
-items[suggestionIndex].textContent;
+items[suggestionIndex]
+.querySelector(".suggestionText")
+.textContent;
+
+}
+
+if(e.key==="Enter"&&suggestionIndex>=0){
+
+e.preventDefault();
+
+search(
+items[suggestionIndex]
+.querySelector(".suggestionText")
+.textContent
+);
 
 }
 
@@ -784,17 +1000,17 @@ suggestions.classList.remove("active");
 
 rubToggle.addEventListener("click",()=>{
 
-const enabled=
+const on=
 document.body.classList.toggle("rubmode");
 
 rubToggle.textContent=
-enabled?
+on?
 "NormalMode":
 "RubMode";
 
 localStorage.setItem(
 "tracebreak-rubmode",
-enabled?"1":"0"
+on?"1":"0"
 );
 
 });
@@ -813,6 +1029,7 @@ function elapsed(){
 return Math.round(
 performance.now()-started
 );
+
 }
 
 function updateStatus(){
@@ -821,11 +1038,12 @@ const count=
 document.querySelectorAll(".result").length;
 
 status.textContent=
-(count||0)+
+count+
 (count===1?" result":" results")+
 " · "+
 elapsed()+
 " ms";
+
 }
 
 function canonical(url){
@@ -855,10 +1073,12 @@ return u.toString();
 }catch{
 
 return String(url);
-}
+
 }
 
-function favicon(url){
+}
+
+function makeFavicon(url){
 
 try{
 
@@ -888,28 +1108,44 @@ return img;
 }catch{
 
 return null;
+
 }
+
+}
+
+function cleanDescription(value){
+
+return String(value||"")
+.replace(/\s+/g," ")
+.replace(
+/^(summary|highlights|notes|overview|description)\s*:\s*/i,
+""
+)
+.trim()
+.slice(0,340)
+.replace(/\s+\S*$/,"");
+
 }
 
 function addResult(item){
 
-if(!item)return false;
+if(!item)return;
 
 const url=
 item.url||
 item.link||
 item.href;
 
-if(!url)return false;
+if(!url)return;
 
 const key=canonical(url);
 
-if(seen.has(key))return false;
+if(seen.has(key))return;
 
 seen.add(key);
 
-const result=document.createElement("article");
-result.className="result";
+const article=document.createElement("article");
+article.className="result";
 
 const head=document.createElement("div");
 head.className="resultHead";
@@ -925,25 +1161,9 @@ loading:"lazy",
 src:item.favicon
 }
 ):
-favicon(url);
+makeFavicon(url);
 
-if(icon){
-
-icon.onerror=()=>{
-
-if(icon.dataset.fallback)return;
-
-icon.dataset.fallback="1";
-
-icon.src=
-"https://www.google.com/s2/favicons?sz=32&domain_url="+
-encodeURIComponent(url);
-
-};
-
-head.appendChild(icon);
-
-}
+if(icon)head.appendChild(icon);
 
 const title=document.createElement("a");
 
@@ -951,7 +1171,6 @@ title.className="resultTitle";
 title.href=url;
 title.target="_blank";
 title.rel="noopener noreferrer";
-
 title.textContent=
 item.title||
 item.name||
@@ -967,40 +1186,23 @@ urlNode.textContent=url;
 const desc=document.createElement("p");
 
 desc.className="resultDesc";
-
-let text=
+desc.textContent=
+cleanDescription(
 item.description||
 item.snippet||
-item.snippet_text||
-"";
+item.snippet_text
+);
 
-text=String(text)
-.replace(/\s+/g," ")
-.replace(
-/^(summary|highlights|notes|overview|description)\s*:\s*/i,
-""
-)
-.trim();
-
-if(text.length>340){
-text=
-text.slice(0,337).trimEnd()+
-"...";
-}
-
-desc.textContent=text;
-
-result.append(
+article.append(
 head,
 urlNode,
 desc
 );
 
-results.appendChild(result);
+results.appendChild(article);
 
 updateStatus();
 
-return true;
 }
 
 function addResults(list){
@@ -1010,14 +1212,16 @@ if(!Array.isArray(list))return;
 for(const item of list){
 addResult(item);
 }
+
 }
 
 function showCorrection(value){
 
-if(!value||value.toLowerCase()===query.toLowerCase())
-return;
-
-correctedQuery=value;
+if(
+!value||
+value.trim().toLowerCase()===
+query.trim().toLowerCase()
+)return;
 
 correction.replaceChildren();
 
@@ -1036,15 +1240,16 @@ link.textContent=value;
 
 correction.append(text,link);
 correction.classList.add("active");
+
 }
 
 function handleCorrection(data){
 
 const value=
 data?.corrected_query||
+data?.did_you_mean||
 data?.suggestion||
-data?.spellcheck||
-data?.did_you_mean;
+data?.spellcheck;
 
 if(typeof value==="string"){
 showCorrection(value);
@@ -1085,6 +1290,7 @@ img.loading="eager";
 img.onerror=()=>img.remove();
 
 knowledgeBody.appendChild(img);
+
 }
 
 if(data.description){
@@ -1095,6 +1301,7 @@ text.className="kText";
 text.textContent=data.description;
 
 knowledgeBody.appendChild(text);
+
 }
 
 if(data.url){
@@ -1108,47 +1315,55 @@ link.rel="noopener noreferrer";
 link.textContent="Read more";
 
 knowledgeBody.appendChild(link);
+
 }
 
 knowledge.classList.add("active");
+
 }
 
-async function wikipedia(){
+async function loadWikipedia(){
 
 try{
 
-const r=await fetch(
+const searchResponse=await fetch(
 "https://en.wikipedia.org/w/api.php"+
 "?action=query"+
 "&list=search"+
 "&srsearch="+
 encodeURIComponent(query)+
-"&srnamespace=0"+
 "&srlimit=1"+
+"&srnamespace=0"+
 "&format=json"+
 "&origin=*",
 {cache:"no-store"}
 );
 
-if(!r.ok)return;
+if(!searchResponse.ok)return;
 
-const d=await r.json();
-const match=d.query?.search?.[0];
+const searchData=
+await searchResponse.json();
+
+const match=
+searchData.query?.search?.[0];
 
 if(!match)return;
 
-const page=await fetch(
+const pageResponse=await fetch(
 "https://en.wikipedia.org/api/rest_v1/page/summary/"+
 encodeURIComponent(match.title),
 {
-headers:{Accept:"application/json"},
+headers:{
+Accept:"application/json"
+},
 cache:"no-store"
 }
 );
 
-if(!page.ok)return;
+if(!pageResponse.ok)return;
 
-const data=await page.json();
+const data=
+await pageResponse.json();
 
 showKnowledge({
 title:data.title,
@@ -1162,44 +1377,80 @@ url:data.content_urls?.desktop?.page
 }catch(e){
 
 console.debug("Wikipedia",e);
-}
+
 }
 
-async function duckduckgo(){
+}
+
+async function loadDDG(){
 
 try{
 
-const r=await fetch(
+const response=await fetch(
 "https://api.duckduckgo.com/?q="+
 encodeURIComponent(query)+
 "&format=json"+
 "&no_html=1"+
 "&skip_disambig=1",
-{cache:"no-store"}
+{
+cache:"no-store"
+}
 );
 
-if(!r.ok)return;
+if(!response.ok)return;
 
-const d=await r.json();
+const data=
+await response.json();
 
 if(
-d.AbstractText&&
+data.AbstractText&&
 !knowledge.classList.contains("active")
 ){
 
 showKnowledge({
-title:d.Heading||query,
-description:d.AbstractText,
-image:d.Image,
-url:d.AbstractURL
+title:data.Heading||query,
+description:data.AbstractText,
+image:data.Image,
+url:data.AbstractURL
 },"DuckDuckGo");
 
 }
 
 }catch(e){
 
-console.debug("DDG",e);
+console.debug("DuckDuckGo",e);
+
 }
+
+}
+
+function addTool(name,value,info){
+
+const box=document.createElement("div");
+box.className="tool";
+
+const title=document.createElement("div");
+title.className="toolName";
+title.textContent=name;
+
+const result=document.createElement("div");
+result.className="toolValue";
+result.textContent=value;
+
+box.append(title,result);
+
+if(info){
+
+const detail=document.createElement("div");
+detail.className="toolInfo";
+detail.textContent=info;
+
+box.appendChild(detail);
+
+}
+
+tools.appendChild(box);
+
 }
 
 function calculator(){
@@ -1208,6 +1459,9 @@ if(
 !/^[0-9+\-*/().%\s]+$/.test(query)
 )return;
 
+if(!/[+\-*/%]/.test(query))
+return;
+
 try{
 
 const value=
@@ -1215,95 +1469,97 @@ Function(
 "\"use strict\";return("+query+")"
 )();
 
-if(!Number.isFinite(value))return;
+if(!Number.isFinite(value))
+return;
 
-const box=document.createElement("div");
-box.className="tool";
-
-const name=document.createElement("div");
-name.className="toolName";
-name.textContent="Calculator";
-
-const answer=document.createElement("div");
-answer.className="toolValue";
-answer.textContent=String(value);
-
-box.append(name,answer);
-tools.appendChild(box);
+addTool(
+"Calculator",
+String(value)
+);
 
 }catch{}
+
 }
 
 function conversion(){
 
-const m=query.match(
+const match=query.match(
 /^(-?[\d.,]+)\s*(km|mi|m|ft|kg|lb|g|oz|c|f|°c|°f)$/i
 );
 
-if(!m)return;
+if(!match)return;
 
 const n=Number(
-m[1].replace(/,/g,"")
+match[1].replace(/,/g,"")
 );
 
-const u=m[2].toLowerCase();
+const u=match[2].toLowerCase();
 
-let out="";
+let output="";
 
-if(u==="km")out=(n*.621371).toFixed(4)+" mi";
-else if(u==="mi")out=(n*1.609344).toFixed(4)+" km";
-else if(u==="m")out=(n*3.28084).toFixed(4)+" ft";
-else if(u==="ft")out=(n*.3048).toFixed(4)+" m";
-else if(u==="kg")out=(n*2.2046226218).toFixed(4)+" lb";
-else if(u==="lb")out=(n*.45359237).toFixed(4)+" kg";
-else if(u==="g")out=(n*.035273962).toFixed(4)+" oz";
-else if(u==="oz")out=(n*28.349523125).toFixed(4)+" g";
-else if(u==="c"||u==="°c")out=(n*9/5+32).toFixed(2)+" °F";
-else if(u==="f"||u==="°f")out=((n-32)*5/9).toFixed(2)+" °C";
+if(u==="km")
+output=(n*.621371).toFixed(4)+" mi";
 
-if(!out)return;
+else if(u==="mi")
+output=(n*1.609344).toFixed(4)+" km";
 
-const box=document.createElement("div");
-box.className="tool";
+else if(u==="m")
+output=(n*3.28084).toFixed(4)+" ft";
 
-const name=document.createElement("div");
-name.className="toolName";
-name.textContent="Conversion";
+else if(u==="ft")
+output=(n*.3048).toFixed(4)+" m";
 
-const value=document.createElement("div");
-value.className="toolValue";
-value.textContent=out;
+else if(u==="kg")
+output=(n*2.2046226218).toFixed(4)+" lb";
 
-box.append(name,value);
-tools.appendChild(box);
+else if(u==="lb")
+output=(n*.45359237).toFixed(4)+" kg";
+
+else if(u==="g")
+output=(n*.035273962).toFixed(4)+" oz";
+
+else if(u==="oz")
+output=(n*28.349523125).toFixed(4)+" g";
+
+else if(u==="c"||u==="°c")
+output=(n*9/5+32).toFixed(2)+" °F";
+
+else if(u==="f"||u==="°f")
+output=((n-32)*5/9).toFixed(2)+" °C";
+
+if(output){
+addTool("Conversion",output);
+}
+
 }
 
 async function weather(){
 
-const m=query.match(
+const match=query.match(
 /^(?:weather|temperature|forecast)\s+(?:in|for|at)\s+(.+)$/i
 );
 
-if(!m)return;
+if(!match)return;
 
 try{
 
 const geo=await fetch(
 "https://geocoding-api.open-meteo.com/v1/search?name="+
-encodeURIComponent(m[1])+
+encodeURIComponent(match[1])+
 "&count=1&language=en&format=json",
 {cache:"no-store"}
 );
 
 if(!geo.ok)return;
 
-const g=await geo.json();
-const place=g.results?.[0];
+const geoData=await geo.json();
+const place=geoData.results?.[0];
 
 if(!place)return;
 
-const r=await fetch(
-"https://api.open-meteo.com/v1/forecast?latitude="+
+const response=await fetch(
+"https://api.open-meteo.com/v1/forecast"+
+"?latitude="+
 place.latitude+
 "&longitude="+
 place.longitude+
@@ -1311,116 +1567,113 @@ place.longitude+
 {cache:"no-store"}
 );
 
-if(!r.ok)return;
+if(!response.ok)return;
 
-const d=await r.json();
+const data=await response.json();
 
-const box=document.createElement("div");
-box.className="tool";
-
-const name=document.createElement("div");
-name.className="toolName";
-name.textContent="Weather · "+place.name;
-
-const value=document.createElement("div");
-value.className="toolValue";
-value.textContent=
-Math.round(d.current.temperature_2m)+
-"°C";
-
-const info=document.createElement("div");
-info.className="toolInfo";
-info.textContent=
+addTool(
+"Weather · "+place.name,
+Math.round(data.current.temperature_2m)+"°C",
 "Wind "+
-Math.round(d.current.wind_speed_10m)+
-" km/h";
-
-box.append(name,value,info);
-tools.appendChild(box);
+Math.round(data.current.wind_speed_10m)+
+" km/h"
+);
 
 }catch(e){
 
 console.debug("Weather",e);
+
 }
+
 }
 
 async function tracebreak(){
 
 try{
 
-const r=await fetch(
+const response=await fetch(
 SUPABASE+
 "tracebreak-search-fast?q="+
 encodeQuery(query)+
 "&limit=100",
 {
-headers:{Accept:"application/json"},
+headers:{
+Accept:"application/json"
+},
 cache:"no-store"
 }
 );
 
-if(!r.ok)return;
+if(!response.ok)return;
 
-const d=await r.json();
+const data=await response.json();
 
-handleCorrection(d);
-
-addResults(d.results||[]);
+handleCorrection(data);
+addResults(data.results||[]);
 
 }catch(e){
 
 console.debug("TraceBreak",e);
+
 }
+
 }
 
 async function search360(){
 
 try{
 
-const r=await fetch(
+const response=await fetch(
 "https://api.360-search.com/?q="+
 encodeQuery(query)+
 "&type=web"+
 "&safe=moderate"+
 "&limit=30",
 {
-headers:{Accept:"application/json"},
+headers:{
+Accept:"application/json"
+},
 cache:"no-store"
 }
 );
 
-if(!r.ok)return;
+if(!response.ok)return;
 
-const d=await r.json();
+const data=await response.json();
 
-addResults(d.results||[]);
+addResults(data.results||[]);
 
 }catch(e){
 
-console.debug("360",e);
+console.debug("360 Search",e);
+
 }
+
 }
 
 async function you(){
 
 try{
 
-const r=await fetch(
+const response=await fetch(
 SUPABASE+
-"tracebreak-meta-fast?provider=you&q="+
+"tracebreak-meta-fast?provider=you"+
+"&q="+
 encodeQuery(query)+
 "&limit=30",
 {
-headers:{Accept:"application/json"},
+headers:{
+Accept:"application/json"
+},
 cache:"no-store"
 }
 );
 
-if(!r.ok)return;
+if(!response.ok)return;
 
-const d=await r.json();
+const data=await response.json();
 
-const provider=d.providers?.you;
+const provider=data.providers?.you;
 
 if(provider){
 
@@ -1435,32 +1688,36 @@ provider.web||
 }catch(e){
 
 console.debug("You",e);
-}
+
 }
 
-async function imageSearch(){
+}
+
+async function imagesSearch(){
 
 try{
 
-const r=await fetch(
+const response=await fetch(
 "https://api.360-search.com/?q="+
 encodeQuery(query)+
 "&type=image"+
 "&safe=moderate"+
 "&limit=12",
 {
-headers:{Accept:"application/json"},
+headers:{
+Accept:"application/json"
+},
 cache:"no-store"
 }
 );
 
-if(!r.ok)return;
+if(!response.ok)return;
 
-const d=await r.json();
+const data=await response.json();
 
 const list=
-Array.isArray(d.results)?
-d.results:
+Array.isArray(data.results)?
+data.results:
 [];
 
 if(!list.length)return;
@@ -1485,6 +1742,7 @@ img.loading="lazy";
 img.onerror=()=>img.remove();
 
 grid.appendChild(img);
+
 }
 
 if(grid.children.length){
@@ -1494,7 +1752,9 @@ images.appendChild(grid);
 }catch(e){
 
 console.debug("Images",e);
+
 }
+
 }
 
 function run(){
@@ -1505,6 +1765,7 @@ status.textContent=
 "Enter a search query.";
 
 return;
+
 }
 
 status.textContent=
@@ -1514,18 +1775,19 @@ elapsed()+
 
 tracebreak();
 
-wikipedia();
-duckduck();
+loadWikipedia();
+loadDDG();
 
 calculator();
 conversion();
 weather();
 
 search360();
-imageSearch();
+imagesSearch();
 you();
 
 updateStatus();
+
 }
 
 run();
