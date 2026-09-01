@@ -5,25 +5,29 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TraceBreak</title>
 <meta name="description" content="Trace the web, not the user.">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/TraceBreak/favicon.svg" type="image/svg+xml">
 
 <style>
 *{box-sizing:border-box}
 
+html{
+scroll-behavior:smooth
+}
+
 body{
 margin:0;
-font-family:Arial,Helvetica,sans-serif;
-color:#171717;
-background:#fff
+background:#fff;
+color:#161616;
+font-family:Arial,Helvetica,sans-serif
 }
 
 header{
 position:sticky;
 top:0;
-z-index:20;
-background:rgba(255,255,255,.96);
+z-index:50;
+background:rgba(255,255,255,.95);
 backdrop-filter:blur(14px);
-border-bottom:1px solid #e7e7e7
+border-bottom:1px solid #e8e8e8
 }
 
 .top{
@@ -40,14 +44,12 @@ color:#111;
 font-size:21px;
 font-weight:700;
 letter-spacing:-1px;
-text-decoration:none;
-white-space:nowrap
+text-decoration:none
 }
 
 .search{
 display:flex;
-flex:1;
-max-width:760px
+width:min(760px,100%)
 }
 
 .search input{
@@ -57,7 +59,7 @@ padding:0 14px;
 border:1px solid #ccc;
 border-right:0;
 border-radius:7px 0 0 7px;
-outline:0;
+outline:none;
 font-size:15px
 }
 
@@ -85,8 +87,8 @@ gap:55px
 
 .stats{
 margin-bottom:24px;
-font-size:13px;
-color:#777
+color:#777;
+font-size:13px
 }
 
 .result{
@@ -95,8 +97,14 @@ animation:appear .12s ease-out
 }
 
 @keyframes appear{
-from{opacity:0;transform:translateY(3px)}
-to{opacity:1;transform:none}
+from{
+opacity:0;
+transform:translateY(4px)
+}
+to{
+opacity:1;
+transform:none
+}
 }
 
 .resultTop{
@@ -130,8 +138,8 @@ margin:5px 0 4px 28px;
 overflow:hidden;
 color:#28743b;
 font-size:13px;
-text-overflow:ellipsis;
-white-space:nowrap
+white-space:nowrap;
+text-overflow:ellipsis
 }
 
 .desc{
@@ -264,7 +272,8 @@ border-right:1px solid #ccc;
 border-radius:7px
 }
 
-.url,.desc{
+.url,
+.desc{
 margin-left:0
 }
 }
@@ -276,7 +285,7 @@ margin-left:0
 <header>
 <div class="top">
 
-<a class="logo" href="/">TraceBreak</a>
+<a class="logo" href="/TraceBreak/">TraceBreak</a>
 
 <form class="search" id="searchForm">
 <input
@@ -318,11 +327,16 @@ Knowledge
 </main>
 
 <script>
+const BASE="/TraceBreak/";
+
 const SUPABASE=
 "https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/";
 
+const params=
+new URLSearchParams(location.search);
+
 const query=
-(new URLSearchParams(location.search).get("q")||"").trim();
+(params.get("q")||"").trim();
 
 const input=
 document.getElementById("queryInput");
@@ -345,11 +359,11 @@ document.getElementById("knowledge");
 const panelBody=
 document.getElementById("knowledgeBody");
 
-const started=
-performance.now();
-
 const seen=
 new Set();
+
+const started=
+performance.now();
 
 input.value=
 query.replace(/\+/g," ");
@@ -364,8 +378,8 @@ return value
 
 document
 .getElementById("searchForm")
-.addEventListener("submit",event=>{
-event.preventDefault();
+.addEventListener("submit",e=>{
+e.preventDefault();
 
 const value=
 input.value.trim();
@@ -373,7 +387,8 @@ input.value.trim();
 if(!value)return;
 
 location.href=
-"/search.html?q="+
+BASE+
+"search?q="+
 encodeQuery(value);
 });
 
@@ -396,6 +411,7 @@ elapsed()+
 }
 
 function cleanSnippet(value){
+
 if(!value)return "";
 
 let text=
@@ -419,6 +435,7 @@ return text;
 }
 
 function canonical(url){
+
 try{
 
 const u=
@@ -436,8 +453,8 @@ u.hash="";
 "fbclid",
 "msclkid",
 "dclid"
-].forEach(key=>{
-u.searchParams.delete(key);
+].forEach(k=>{
+u.searchParams.delete(k);
 });
 
 return u.toString();
@@ -447,7 +464,8 @@ return url;
 }
 }
 
-function favicon(url){
+function makeFavicon(url){
+
 try{
 
 const u=
@@ -502,25 +520,21 @@ document.createElement("div");
 
 top.className="resultTop";
 
-const icon=
-item.favicon
-?
-document.createElement("img")
-:
-favicon(url);
+let icon;
 
-if(icon){
+if(item.favicon){
+
+icon=
+document.createElement("img");
 
 icon.className="icon";
 icon.alt="";
 icon.loading="lazy";
-
-if(item.favicon){
 icon.src=item.favicon;
 
 icon.onerror=()=>{
 const fallback=
-favicon(url);
+makeFavicon(url);
 
 if(fallback){
 icon.replaceWith(fallback);
@@ -528,8 +542,13 @@ icon.replaceWith(fallback);
 icon.remove();
 }
 };
+
+}else{
+icon=
+makeFavicon(url);
 }
 
+if(icon){
 top.appendChild(icon);
 }
 
@@ -540,6 +559,7 @@ title.className="resultTitle";
 title.href=url;
 title.target="_blank";
 title.rel="noopener noreferrer";
+
 title.textContent=
 item.title||
 item.name||
@@ -628,9 +648,9 @@ document.createElement("img");
 image.className=
 "panelImage";
 
-image.loading="eager";
 image.src=data.image;
 image.alt="";
+image.loading="eager";
 
 image.onerror=()=>{
 image.remove();
@@ -664,6 +684,7 @@ link.className=
 link.href=data.url;
 link.target="_blank";
 link.rel="noopener noreferrer";
+
 link.textContent=
 "Read more";
 
@@ -677,7 +698,8 @@ async function wikipedia(){
 
 try{
 
-const search=
+const response=
+await fetch(
 "https://en.wikipedia.org/w/api.php"+
 "?action=query"+
 "&list=search"+
@@ -685,12 +707,10 @@ const search=
 encodeURIComponent(query)+
 "&srlimit=1"+
 "&format=json"+
-"&origin=*";
-
-const response=
-await fetch(
-search,
-{cache:"no-store"}
+"&origin=*",
+{
+cache:"no-store"
+}
 );
 
 if(!response.ok)return;
@@ -703,13 +723,10 @@ data.query?.search?.[0];
 
 if(!match)return;
 
-const summary=
-"https://en.wikipedia.org/api/rest_v1/page/summary/"+
-encodeURIComponent(match.title);
-
-const result=
+const page=
 await fetch(
-summary,
+"https://en.wikipedia.org/api/rest_v1/page/summary/"+
+encodeURIComponent(match.title),
 {
 headers:{
 Accept:"application/json"
@@ -718,23 +735,23 @@ cache:"no-store"
 }
 );
 
-if(!result.ok)return;
+if(!page.ok)return;
 
-const page=
-await result.json();
+const result=
+await page.json();
 
 showKnowledge({
-title:page.title,
-description:page.extract,
+title:result.title,
+description:result.extract,
 image:
-page.thumbnail?.source||
-page.originalimage?.source,
+result.thumbnail?.source||
+result.originalimage?.source,
 url:
-page.content_urls?.desktop?.page
+result.content_urls?.desktop?.page
 },"Wikipedia");
 
-}catch(error){
-console.debug("Wikipedia",error);
+}catch(e){
+console.debug("Wikipedia",e);
 }
 }
 
@@ -771,16 +788,14 @@ query,
 description:
 data.AbstractText,
 image:
-data.Image||
-"",
+data.Image,
 url:
-data.AbstractURL||
-""
+data.AbstractURL
 },"DuckDuckGo");
 }
 
-}catch(error){
-console.debug("DDG",error);
+}catch(e){
+console.debug("DDG",e);
 }
 }
 
@@ -818,7 +833,10 @@ answer.className="toolValue";
 answer.textContent=
 String(value);
 
-box.append(title,answer);
+box.append(
+title,
+answer
+);
 
 tools.appendChild(box);
 
@@ -829,7 +847,7 @@ function conversion(){
 
 const match=
 query.match(
-/^(-?[\d.,]+)\s*(km|mi|m|ft|kg|lb|c|f|°c|°f)$/i
+/^(-?[\d.,]+)\s*(km|mi|m|ft|kg|lb|g|oz|c|f|°c|°f)$/i
 );
 
 if(!match)return;
@@ -848,31 +866,39 @@ if(unit==="km")
 output=
 (number*.621371).toFixed(4)+" mi";
 
-if(unit==="mi")
+else if(unit==="mi")
 output=
 (number*1.609344).toFixed(4)+" km";
 
-if(unit==="m")
+else if(unit==="m")
 output=
 (number*3.28084).toFixed(4)+" ft";
 
-if(unit==="ft")
+else if(unit==="ft")
 output=
 (number*.3048).toFixed(4)+" m";
 
-if(unit==="kg")
+else if(unit==="kg")
 output=
 (number*2.2046226218).toFixed(4)+" lb";
 
-if(unit==="lb")
+else if(unit==="lb")
 output=
 (number*.45359237).toFixed(4)+" kg";
 
-if(unit==="c"||unit==="°c")
+else if(unit==="g")
+output=
+(number*.035273962).toFixed(4)+" oz";
+
+else if(unit==="oz")
+output=
+(number*28.349523125).toFixed(4)+" g";
+
+else if(unit==="c"||unit==="°c")
 output=
 (number*9/5+32).toFixed(2)+" °F";
 
-if(unit==="f"||unit==="°f")
+else if(unit==="f"||unit==="°f")
 output=
 ((number-32)*5/9).toFixed(2)+" °C";
 
@@ -895,28 +921,27 @@ document.createElement("div");
 answer.className="toolValue";
 answer.textContent=output;
 
-box.append(title,answer);
+box.append(
+title,
+answer
+);
 
 tools.appendChild(box);
 }
 
 async function weather(){
 
-if(
-!/^\s*(weather|temperature|forecast)\b/i.test(query)
-)return;
+const match=
+query.match(
+/^\s*(?:weather|temperature|forecast)\s+(?:in|for|at)\s+(.+)$/i
+);
 
-try{
+if(!match)return;
 
 const city=
-query
-.replace(
-/^\s*(weather|temperature|forecast)\b/i,
-""
-)
-.trim();
+match[1].trim();
 
-if(!city)return;
+try{
 
 const geo=
 await fetch(
@@ -944,7 +969,7 @@ await fetch(
 place.latitude+
 "&longitude="+
 place.longitude+
-"&current=temperature_2m,wind_speed_10m",
+"&current=temperature_2m,weather_code,wind_speed_10m",
 {
 cache:"no-store"
 }
@@ -955,6 +980,9 @@ if(!response.ok)return;
 const data=
 await response.json();
 
+const current=
+data.current;
+
 const box=
 document.createElement("div");
 
@@ -964,6 +992,7 @@ const title=
 document.createElement("div");
 
 title.className="toolTitle";
+
 title.textContent=
 "Weather · "+
 place.name;
@@ -972,8 +1001,11 @@ const value=
 document.createElement("div");
 
 value.className="toolValue";
+
 value.textContent=
-data.current.temperature_2m+
+Math.round(
+current.temperature_2m
+)+
 "°C";
 
 const small=
@@ -983,7 +1015,9 @@ small.className="toolSmall";
 
 small.textContent=
 "Wind "+
-data.current.wind_speed_10m+
+Math.round(
+current.wind_speed_10m
+)+
 " km/h";
 
 box.append(
@@ -994,8 +1028,8 @@ small
 
 tools.appendChild(box);
 
-}catch(error){
-console.debug("Weather",error);
+}catch(e){
+console.debug("Weather",e);
 }
 }
 
@@ -1027,8 +1061,8 @@ data.results||
 []
 );
 
-}catch(error){
-console.debug("TraceBreak",error);
+}catch(e){
+console.debug("TraceBreak index",e);
 }
 }
 
@@ -1041,6 +1075,7 @@ await fetch(
 "https://api.360-search.com/?q="+
 encodeQuery(query)+
 "&type=web"+
+"&safe=moderate"+
 "&limit=30",
 {
 headers:{
@@ -1060,12 +1095,12 @@ data.results||
 []
 );
 
-}catch(error){
-console.debug("360",error);
+}catch(e){
+console.debug("360",e);
 }
 }
 
-async function searchYou(){
+async function youSearch(){
 
 try{
 
@@ -1088,14 +1123,13 @@ if(!response.ok)return;
 const data=
 await response.json();
 
-const list=
+addResults(
 data.providers?.you?.results||
-[];
+[]
+);
 
-addResults(list);
-
-}catch(error){
-console.debug("You",error);
+}catch(e){
+console.debug("You",e);
 }
 }
 
@@ -1108,6 +1142,7 @@ await fetch(
 "https://api.360-search.com/?q="+
 encodeQuery(query)+
 "&type=image"+
+"&safe=moderate"+
 "&limit=12",
 {
 headers:{
@@ -1153,6 +1188,10 @@ item.title||
 "";
 image.loading="lazy";
 
+image.onerror=()=>{
+image.remove();
+};
+
 grid.appendChild(image);
 }
 
@@ -1160,8 +1199,8 @@ if(grid.children.length){
 images.appendChild(grid);
 }
 
-}catch(error){
-console.debug("Images",error);
+}catch(e){
+console.debug("Images",e);
 }
 }
 
@@ -1180,20 +1219,24 @@ stats.textContent=
 elapsed()+
 " ms";
 
-/*
- * Independent requests.
- * Nothing waits for another provider.
- */
-
 localSearch();
 wikipedia();
 duckDuckGo();
+
 calculator();
 conversion();
 weather();
+
 search360();
 imageSearch();
-searchYou();
+
+/*
+You is intentionally last.
+It is completely independent and
+cannot delay the TraceBreak index.
+*/
+
+youSearch();
 }
 
 run();
