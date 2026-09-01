@@ -4,250 +4,52 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TraceBreak</title>
-<meta name="description" content="Trace the web, not the user.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 
 <style>
 *{box-sizing:border-box}
-
-:root{
-font-family:Arial,Helvetica,sans-serif;
-color:#171717;
-background:#fff
-}
-
-body{
-margin:0;
-background:#fff
-}
-
-header{
-position:sticky;
-top:0;
-z-index:20;
-padding:14px 24px;
-border-bottom:1px solid #e7e7e7;
-background:rgba(255,255,255,.96);
-backdrop-filter:blur(14px)
-}
-
-.top{
-width:min(1120px,100%);
-margin:auto;
-display:flex;
-align-items:center;
-gap:24px
-}
-
-.brand{
-color:#171717;
-font-size:20px;
-font-weight:700;
-letter-spacing:-1px;
-text-decoration:none;
-white-space:nowrap
-}
-
-.search{
-display:flex;
-width:min(760px,100%);
-gap:8px
-}
-
-.search input{
-width:100%;
-height:42px;
-padding:0 14px;
-border:1px solid #cfcfcf;
-border-radius:7px;
-outline:0;
-font-size:15px
-}
-
-.search input:focus{
-border-color:#777;
-box-shadow:0 0 0 3px rgba(0,0,0,.05)
-}
-
-.search button{
-height:42px;
-padding:0 18px;
-border:0;
-border-radius:7px;
-background:#171717;
-color:#fff;
-cursor:pointer
-}
-
-.layout{
-width:min(1120px,calc(100% - 48px));
-margin:28px auto 90px;
-display:grid;
-grid-template-columns:minmax(0,1fr) 310px;
-gap:48px
-}
-
-.meta{
-margin-bottom:22px;
-color:#777;
-font-size:13px
-}
-
-.result{
-margin-bottom:28px;
-animation:show .12s ease-out
-}
-
-@keyframes show{
-from{
-opacity:0;
-transform:translateY(3px)
-}
-to{
-opacity:1;
-transform:translateY(0)
-}
-}
-
-.result-head{
-display:flex;
-align-items:flex-start;
-gap:9px
-}
-
-.favicon{
-width:20px;
-height:20px;
-margin-top:2px;
-object-fit:contain;
-border-radius:4px;
-flex:0 0 20px
-}
-
-.result-title{
-color:#174ea6;
-font-size:19px;
-line-height:1.3;
-text-decoration:none
-}
-
-.result-title:hover{
-text-decoration:underline
-}
-
-.result-url{
-margin:5px 0 4px 29px;
-overflow:hidden;
-color:#28743b;
-font-size:13px;
-text-overflow:ellipsis;
-white-space:nowrap
-}
-
-.description{
-max-width:760px;
-margin:0 0 0 29px;
-color:#4b4b4b;
-font-size:14px;
-line-height:1.55
-}
-
-.knowledge{
-display:none;
-align-self:start;
-border-left:1px solid #e5e5e5;
-padding-left:24px
-}
-
-.knowledge.visible{
-display:block
-}
-
-.knowledge-label{
-margin-bottom:14px;
-color:#777;
-font-size:11px;
-font-weight:600;
-letter-spacing:.1em;
-text-transform:uppercase
-}
-
-.knowledge-title{
-margin:0;
-font-size:24px;
-line-height:1.2
-}
-
-.knowledge-source{
-margin:6px 0 15px;
-color:#777;
-font-size:12px
-}
-
-.knowledge-image{
-display:block;
-width:100%;
-max-height:190px;
-margin-bottom:15px;
-border-radius:7px;
-object-fit:cover
-}
-
-.knowledge-description{
-margin:0;
-color:#444;
-font-size:14px;
-line-height:1.55
-}
-
-.knowledge-link{
-display:inline-block;
-margin-top:13px;
-color:#174ea6;
-font-size:13px;
-text-decoration:none
-}
-
-.empty{
-padding:35px 0;
-color:#777;
-font-size:14px
-}
-
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#181818;background:#fff}
+header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #e5e5e5}
+.top{width:min(1160px,calc(100% - 32px));margin:auto;min-height:68px;display:flex;align-items:center;gap:24px}
+.logo{font-weight:700;font-size:21px;letter-spacing:-1px;text-decoration:none;color:#111}
+.search{display:flex;flex:1;max-width:760px}
+.search input{width:100%;height:42px;border:1px solid #ccc;border-radius:7px 0 0 7px;padding:0 14px;font-size:15px;outline:none}
+.search input:focus{border-color:#777}
+.search button{height:42px;border:0;background:#171717;color:#fff;padding:0 20px;border-radius:0 7px 7px 0;cursor:pointer}
+.layout{width:min(1160px,calc(100% - 32px));margin:25px auto 80px;display:grid;grid-template-columns:minmax(0,760px) 320px;gap:55px}
+.stats{font-size:13px;color:#777;margin-bottom:24px}
+.result{margin-bottom:27px}
+.resultTop{display:flex;gap:9px}
+.icon{width:19px;height:19px;object-fit:contain;margin-top:3px;border-radius:4px}
+.resultTitle{font-size:19px;line-height:1.3;color:#174ea6;text-decoration:none}
+.resultTitle:hover{text-decoration:underline}
+.url{margin:5px 0 4px 28px;font-size:13px;color:#28743b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.desc{margin:0 0 0 28px;font-size:14px;line-height:1.55;color:#4b4b4b}
+.panel{display:none;border-left:1px solid #e5e5e5;padding-left:24px}
+.panel.show{display:block}
+.panelLabel{font-size:11px;color:#777;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:13px}
+.panel h2{font-size:24px;margin:0 0 5px;line-height:1.2}
+.panelSource{font-size:12px;color:#777;margin-bottom:14px}
+.panel img{display:block;width:100%;max-height:190px;object-fit:cover;border-radius:7px;margin-bottom:14px}
+.panel p{font-size:14px;line-height:1.55;color:#444;margin:0}
+.panel a{display:inline-block;margin-top:12px;font-size:13px;color:#174ea6;text-decoration:none}
+.tool{border:1px solid #e4e4e4;border-radius:9px;padding:15px;margin-bottom:18px}
+.toolTitle{font-size:13px;font-weight:700;margin-bottom:8px}
+.toolValue{font-size:22px}
+.toolSmall{font-size:13px;color:#666;margin-top:4px}
+.weatherIcon{font-size:27px;margin-right:8px}
+.imageGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 28px}
+.imageGrid img{width:100%;height:110px;object-fit:cover;border-radius:6px}
 @media(max-width:850px){
-.layout{
-grid-template-columns:1fr
+.layout{grid-template-columns:1fr}
+.panel{border-left:0;border-top:1px solid #e5e5e5;padding:24px 0 0}
 }
-
-.knowledge{
-border-top:1px solid #e5e5e5;
-border-left:0;
-padding:25px 0 0
-}
-}
-
 @media(max-width:600px){
-header{
-padding:13px 16px
-}
-
-.top{
-gap:14px
-}
-
-.search button{
-display:none
-}
-
-.layout{
-width:calc(100% - 32px);
-margin-top:22px
-}
-
-.result-url,
-.description{
-margin-left:0
-}
+.top{gap:12px}
+.logo{font-size:18px}
+.search button{display:none}
+.search input{border-radius:7px}
+.url,.desc{margin-left:0}
 }
 </style>
 </head>
@@ -256,49 +58,34 @@ margin-left:0
 
 <header>
 <div class="top">
+<a class="logo" href="index.html">TraceBreak</a>
 
-<a class="brand" href="index.html">TraceBreak</a>
-
-<form class="search" id="search-form">
-<input
-id="query"
-type="search"
-autocomplete="off"
-spellcheck="false"
->
-<button type="submit">Search</button>
+<form class="search" id="form">
+<input id="q" type="search" autocomplete="off" spellcheck="false">
+<button>Search</button>
 </form>
-
 </div>
 </header>
 
 <main class="layout">
 
 <section>
-
-<div class="meta" id="meta">
-Searching...
-</div>
-
+<div class="stats" id="stats">Searching...</div>
+<div id="tools"></div>
+<div id="images"></div>
 <div id="results"></div>
-
 </section>
 
-<aside id="knowledge" class="knowledge">
-
-<div class="knowledge-label">
-Knowledge
-</div>
-
-<div id="knowledge-content"></div>
-
+<aside class="panel" id="panel">
+<div class="panelLabel">Knowledge</div>
+<div id="panelBody"></div>
 </aside>
 
 </main>
 
 <script>
-const SUPABASE=
-"https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/tracebreak-search-fast";
+const SUPA=
+"https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/";
 
 const params=
 new URLSearchParams(location.search);
@@ -306,63 +93,78 @@ new URLSearchParams(location.search);
 const query=
 (params.get("q")||"").trim();
 
-const input=
-document.getElementById("query");
+const q=
+document.getElementById("q");
+
+const stats=
+document.getElementById("stats");
 
 const results=
 document.getElementById("results");
 
-const meta=
-document.getElementById("meta");
+const tools=
+document.getElementById("tools");
 
-const knowledge=
-document.getElementById("knowledge");
+const images=
+document.getElementById("images");
 
-const knowledgeContent=
-document.getElementById("knowledge-content");
+const panel=
+document.getElementById("panel");
 
-const seen=
-new Set();
+const panelBody=
+document.getElementById("panelBody");
 
 const started=
 performance.now();
 
-input.value=
+const seen=
+new Set();
+
+q.value=
 query.replace(/\+/g," ");
 
-function encodeQuery(value){
-let output="";
-
-for(const char of value.trim()){
-if(char==="+"){
-output+="+";
-}else{
-output+=encodeURIComponent(char);
-}
-}
-
-return output;
+function plusQuery(value){
+return value
+.trim()
+.split(/\s+/)
+.map(encodeURIComponent)
+.join("+");
 }
 
 document
-.getElementById("search-form")
-.addEventListener("submit",event=>{
-event.preventDefault();
+.getElementById("form")
+.addEventListener("submit",e=>{
+e.preventDefault();
 
 const value=
-input.value.trim();
+q.value.trim();
 
-if(!value)return;
-
+if(value){
 location.href=
-"search.html?q="+
-encodeQuery(value);
+"search.html?q="+plusQuery(value);
+}
 });
 
-function canonical(value){
+function elapsed(){
+return Math.round(performance.now()-started);
+}
+
+function updateStats(){
+const count=
+document.querySelectorAll(".result").length;
+
+stats.textContent=
+(count||0)+
+(count===1?" result":" results")+
+" · "+
+elapsed()+
+" ms";
+}
+
+function key(url){
 try{
 const u=
-new URL(value);
+new URL(url);
 
 u.hash="";
 
@@ -374,103 +176,90 @@ u.hash="";
 "utm_content",
 "gclid",
 "fbclid",
-"msclkid",
-"dclid"
-].forEach(key=>{
-u.searchParams.delete(key);
-});
+"msclkid"
+].forEach(x=>u.searchParams.delete(x));
 
 return u.toString();
 }catch{
-return value;
+return url;
 }
 }
 
-function favicon(url){
+function makeIcon(url){
 try{
 const u=
 new URL(url);
 
-const image=
+const img=
 document.createElement("img");
 
-image.className="favicon";
-image.alt="";
-image.loading="lazy";
-image.src=
-u.origin+
-"/favicon.ico";
+img.className="icon";
+img.loading="lazy";
+img.alt="";
+img.src=
+u.origin+"/favicon.ico";
 
-image.onerror=()=>{
-image.remove();
+img.onerror=()=>{
+img.remove();
 };
 
-return image;
+return img;
 }catch{
 return null;
 }
 }
 
 function addResult(item){
-if(!item)return false;
-
 const url=
-item.url||
-item.link;
+item?.url||
+item?.link||
+item?.href;
 
 if(!url)return false;
 
-const key=
-canonical(url);
+const k=
+key(url);
 
-if(seen.has(key))return false;
+if(seen.has(k))return false;
 
-seen.add(key);
+seen.add(k);
 
 const article=
 document.createElement("article");
 
 article.className="result";
 
-const head=
+const top=
 document.createElement("div");
 
-head.className="result-head";
+top.className="resultTop";
 
-if(item.favicon){
 const icon=
-document.createElement("img");
-
-icon.className="favicon";
-icon.alt="";
-icon.loading="lazy";
-icon.src=item.favicon;
-
-icon.onerror=()=>{
-const fallback=
-favicon(url);
-
-if(fallback){
-icon.replaceWith(fallback);
-}else{
-icon.remove();
-}
-};
-
-head.appendChild(icon);
-}else{
-const icon=
-favicon(url);
+item.favicon?
+document.createElement("img"):
+makeIcon(url);
 
 if(icon){
-head.appendChild(icon);
+icon.className="icon";
+icon.loading="lazy";
+icon.alt="";
+
+if(item.favicon){
+icon.src=item.favicon;
+icon.onerror=()=>{
+const fallback=makeIcon(url);
+if(fallback)icon.replaceWith(fallback);
+else icon.remove();
+};
 }
+
+top.appendChild(icon);
 }
 
 const title=
 document.createElement("a");
 
-title.className="result-title";
+title.className="resultTitle";
 title.href=url;
 title.target="_blank";
 title.rel="noopener noreferrer";
@@ -479,348 +268,529 @@ item.title||
 item.name||
 url;
 
-head.appendChild(title);
+top.appendChild(title);
 
-const urlLine=
+const urlNode=
 document.createElement("div");
 
-urlLine.className="result-url";
-urlLine.textContent=url;
+urlNode.className="url";
+urlNode.textContent=url;
 
-const description=
+const desc=
 document.createElement("p");
 
-description.className="description";
-description.textContent=
+desc.className="desc";
+desc.textContent=
 item.description||
 item.snippet||
 "";
 
-article.appendChild(head);
-article.appendChild(urlLine);
-article.appendChild(description);
-
+article.append(top,urlNode,desc);
 results.appendChild(article);
+
+updateStats();
 
 return true;
 }
 
-function addResults(items){
-if(!Array.isArray(items))return 0;
+function addResults(list){
+if(!Array.isArray(list))return;
 
-let count=0;
-
-for(const item of items){
-if(addResult(item)){
-count++;
+for(const item of list){
+addResult(item);
 }
 }
 
-return count;
-}
-
-function updateCount(){
-const count=
-document.querySelectorAll(".result").length;
-
-if(count){
-meta.textContent=
-count+
-(count===1?" result":" results")+
-" · "+
-Math.round(performance.now()-started)+
-" ms";
-}else{
-meta.textContent=
-"No indexed results · "+
-Math.round(performance.now()-started)+
-" ms";
-}
-}
-
-async function localSearch(){
-try{
-
-const response=
-await fetch(
-SUPABASE+
-"?q="+
-encodeQuery(query)+
-"&limit=100",
-{
-headers:{
-Accept:"application/json"
-},
-cache:"no-store"
-}
-);
-
-if(!response.ok){
-throw Error("search failed");
-}
-
-const data=
-await response.json();
-
-const count=
-addResults(data.results||[]);
-
-const elapsed=
-Number.isFinite(data.elapsed_ms)?
-data.elapsed_ms:
-Math.round(performance.now()-started);
-
-meta.textContent=
-(count||0)+
-(count===1?" result":" results")+
-" · "+
-elapsed+
-" ms";
-
-}catch(error){
-
-console.error(error);
-
-meta.textContent=
-"Search unavailable · "+
-Math.round(performance.now()-started)+
-" ms";
-}
-}
-
-async function wikipedia(){
-if(!query)return;
-
-try{
-
-const title=
-query
-.replace(/\s+/g," ")
-.trim();
-
-const response=
-await fetch(
-"https://en.wikipedia.org/api/rest_v1/page/summary/"+
-encodeURIComponent(title),
-{
-headers:{
-Accept:"application/json"
-},
-cache:"no-store"
-}
-);
-
-if(!response.ok)return;
-
-const data=
-await response.json();
-
-if(
-data.type==="https://mediawiki.org/wiki/HyperSwitch/errors/not_found"
-){
-return;
-}
-
-if(!data.title&&!data.extract){
-return;
-}
-
-showKnowledge({
-title:data.title,
-description:data.extract,
-image:data.thumbnail?.source||
-data.originalimage?.source||
-"",
-url:data.content_urls?.desktop?.page||
-data.content_urls?.mobile?.page||
-""
-});
-
-}catch(error){
-console.debug("Wikipedia:",error);
-}
-}
-
-function showKnowledge(item){
-knowledgeContent.replaceChildren();
+function showPanel(data,source){
+panelBody.replaceChildren();
 
 const title=
 document.createElement("h2");
 
-title.className="knowledge-title";
 title.textContent=
-item.title||
+data.title||
 query;
 
-knowledgeContent.appendChild(title);
-
-const source=
+const src=
 document.createElement("div");
 
-source.className="knowledge-source";
-source.textContent=
-"Wikipedia";
+src.className="panelSource";
+src.textContent=source;
 
-knowledgeContent.appendChild(source);
+panelBody.append(title,src);
 
-if(item.image){
+if(data.image){
 
-const image=
+const img=
 document.createElement("img");
 
-image.className="knowledge-image";
-image.loading="eager";
-image.src=item.image;
-image.alt="";
+img.src=data.image;
+img.alt="";
+img.loading="eager";
 
-image.onerror=()=>{
-image.remove();
+img.onerror=()=>{
+img.remove();
 };
 
-knowledgeContent.appendChild(image);
+panelBody.appendChild(img);
 }
 
-if(item.description){
+if(data.description){
 
-const description=
+const p=
 document.createElement("p");
 
-description.className=
-"knowledge-description";
-
-description.textContent=
-item.description;
-
-knowledgeContent.appendChild(description);
+p.textContent=data.description;
+panelBody.appendChild(p);
 }
 
-if(item.url){
+if(data.url){
 
-const link=
+const a=
 document.createElement("a");
 
-link.className="knowledge-link";
-link.href=item.url;
-link.target="_blank";
-link.rel="noopener noreferrer";
-link.textContent="Wikipedia";
+a.href=data.url;
+a.target="_blank";
+a.rel="noopener noreferrer";
+a.textContent="Read more";
 
-knowledgeContent.appendChild(link);
+panelBody.appendChild(a);
 }
 
-knowledge.classList.add("visible");
+panel.classList.add("show");
 }
 
-async function youSearch(){
+async function wikipedia(){
 try{
-
-const endpoint=
-"https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/tracebreak-meta?q="+
-encodeQuery(query)+
-"&provider=you&limit=20";
 
 const response=
 await fetch(
-endpoint,
+"https://en.wikipedia.org/api/rest_v1/page/summary/"+
+encodeURIComponent(query),
 {
-headers:{
-Accept:"application/json"
-},
+headers:{Accept:"application/json"},
 cache:"no-store"
 }
 );
 
 if(!response.ok)return;
 
-const data=
+const d=
 await response.json();
 
-const items=
-data.you?.results||
-data.providers?.you?.results||
-data.results||
-[];
+if(!d.title&&!d.extract)return;
 
-addResults(items);
+showPanel({
+title:d.title,
+description:d.extract,
+image:d.thumbnail?.source||
+d.originalimage?.source,
+url:d.content_urls?.desktop?.page
+},"Wikipedia");
 
-updateCount();
+}catch{}
+}
+
+async function ddg(){
+try{
+
+const response=
+await fetch(
+"https://api.duckduckgo.com/?q="+
+encodeURIComponent(query)+
+"&format=json&no_html=1&skip_disambig=1",
+{
+cache:"no-store"
+}
+);
+
+if(!response.ok)return;
+
+const d=
+await response.json();
+
+if(
+d.AbstractText&&
+!panel.classList.contains("show")
+){
+
+showPanel({
+title:d.Heading||query,
+description:d.AbstractText,
+image:d.Image||"",
+url:d.AbstractURL||""
+},"DuckDuckGo");
+}
+
+}catch{}
+}
+
+function calculator(){
+
+if(!/^[0-9+\-*/().%\s]+$/.test(query)){
+return;
+}
+
+try{
+
+const value=
+Function(
+"\"use strict\";return("+query+")"
+)();
+
+if(!Number.isFinite(value))return;
+
+const box=
+document.createElement("div");
+
+box.className="tool";
+
+const title=
+document.createElement("div");
+
+title.className="toolTitle";
+title.textContent="Calculator";
+
+const answer=
+document.createElement("div");
+
+answer.className="toolValue";
+answer.textContent=String(value);
+
+box.append(title,answer);
+tools.appendChild(box);
+
+}catch{}
+}
+
+function convert(){
+
+const m=
+query.match(
+/^(-?[\d.,]+)\s*(km|mi|m|ft|kg|lb|c|f|°c|°f)$/i
+);
+
+if(!m)return;
+
+const n=
+Number(m[1].replace(/,/g,""));
+
+const unit=
+m[2].toLowerCase();
+
+let value;
+let out;
+
+if(unit==="km"){
+value=n*0.621371;
+out=value.toFixed(4)+" mi";
+}
+
+if(unit==="mi"){
+value=n*1.609344;
+out=value.toFixed(4)+" km";
+}
+
+if(unit==="m"){
+value=n*3.28084;
+out=value.toFixed(4)+" ft";
+}
+
+if(unit==="ft"){
+value=n*0.3048;
+out=value.toFixed(4)+" m";
+}
+
+if(unit==="kg"){
+value=n*2.2046226218;
+out=value.toFixed(4)+" lb";
+}
+
+if(unit==="lb"){
+value=n*0.45359237;
+out=value.toFixed(4)+" kg";
+}
+
+if(unit==="c"||unit==="°c"){
+value=n*9/5+32;
+out=value.toFixed(2)+" °F";
+}
+
+if(unit==="f"||unit==="°f"){
+value=(n-32)*5/9;
+out=value.toFixed(2)+" °C";
+}
+
+if(!out)return;
+
+const box=
+document.createElement("div");
+
+box.className="tool";
+
+const title=
+document.createElement("div");
+
+title.className="toolTitle";
+title.textContent="Conversion";
+
+const answer=
+document.createElement("div");
+
+answer.className="toolValue";
+answer.textContent=out;
+
+box.append(title,answer);
+tools.appendChild(box);
+}
+
+async function weather(){
+
+if(!/\b(weather|temperature|forecast)\b/i.test(query)){
+return;
+}
+
+try{
+
+const city=
+query
+.replace(/\b(weather|temperature|forecast)\b/gi,"")
+.trim();
+
+if(!city)return;
+
+const geo=
+await fetch(
+"https://geocoding-api.open-meteo.com/v1/search?name="+
+encodeURIComponent(city)+
+"&count=1&language=en&format=json"
+);
+
+const g=
+await geo.json();
+
+const place=
+g.results?.[0];
+
+if(!place)return;
+
+const response=
+await fetch(
+"https://api.open-meteo.com/v1/forecast?latitude="+
+place.latitude+
+"&longitude="+
+place.longitude+
+"&current=temperature_2m,weather_code,wind_speed_10m"
+);
+
+const d=
+await response.json();
+
+const box=
+document.createElement("div");
+
+box.className="tool";
+
+const title=
+document.createElement("div");
+
+title.className="toolTitle";
+title.textContent=
+"Weather · "+
+place.name;
+
+const value=
+document.createElement("div");
+
+value.className="toolValue";
+
+value.textContent=
+d.current.temperature_2m+
+"°C";
+
+const small=
+document.createElement("div");
+
+small.className="toolSmall";
+
+small.textContent=
+"Wind "+
+d.current.wind_speed_10m+
+" km/h";
+
+box.append(title,value,small);
+tools.appendChild(box);
+
+}catch{}
+}
+
+async function searchLocal(){
+
+try{
+
+const response=
+await fetch(
+SUPA+
+"tracebreak-search-fast?q="+
+plusQuery(query)+
+"&limit=100",
+{
+headers:{Accept:"application/json"},
+cache:"no-store"
+}
+);
+
+if(!response.ok)return;
+
+const d=
+await response.json();
+
+addResults(d.results||[]);
 
 }catch(error){
-console.debug("You:",error);
+console.debug(error);
 }
 }
 
 async function search360(){
-try{
 
-const endpoint=
-"https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/tracebreak-meta?q="+
-encodeQuery(query)+
-"&provider=360&limit=20";
+try{
 
 const response=
 await fetch(
-endpoint,
+"https://api.360-search.com/?q="+
+plusQuery(query)+
+"&type=web&limit=30",
 {
-headers:{
-Accept:"application/json"
-},
+headers:{Accept:"application/json"},
 cache:"no-store"
 }
 );
 
 if(!response.ok)return;
 
-const data=
+const d=
 await response.json();
 
-const items=
-data["360"]?.results||
-data.providers?.["360"]?.results||
-data.results||
-[];
-
-addResults(items);
-
-updateCount();
+addResults(d.results||[]);
 
 }catch(error){
 console.debug("360:",error);
 }
 }
 
-async function run(){
+async function searchYou(){
+
+try{
+
+const response=
+await fetch(
+SUPA+
+"tracebreak-meta-fast?provider=you&q="+
+plusQuery(query)+
+"&limit=30",
+{
+headers:{Accept:"application/json"},
+cache:"no-store"
+}
+);
+
+if(!response.ok)return;
+
+const d=
+await response.json();
+
+addResults(
+d.providers?.you?.results||
+d.you?.results||
+[]
+);
+
+}catch(error){
+console.debug("You:",error);
+}
+}
+
+async function imagesSearch(){
+
+try{
+
+const response=
+await fetch(
+"https://api.360-search.com/?q="+
+plusQuery(query)+
+"&type=image&limit=12",
+{
+headers:{Accept:"application/json"},
+cache:"no-store"
+}
+);
+
+if(!response.ok)return;
+
+const d=
+await response.json();
+
+const list=
+Array.isArray(d.results)?
+d.results:[];
+
+if(!list.length)return;
+
+const grid=
+document.createElement("div");
+
+grid.className="imageGrid";
+
+for(const item of list){
+
+const src=
+item.image||
+item.thumbnail;
+
+if(!src)continue;
+
+const img=
+document.createElement("img");
+
+img.src=src;
+img.alt=item.title||"";
+img.loading="lazy";
+
+grid.appendChild(img);
+}
+
+if(grid.children.length){
+images.appendChild(grid);
+}
+
+}catch{}
+}
+
+function run(){
 
 if(!query){
 
-meta.textContent="Enter a search query.";
-
-results.className="empty";
-results.textContent=
-"Search the web with TraceBreak.";
+stats.textContent=
+"Enter a search query.";
 
 return;
 }
 
-results.innerHTML="";
-meta.textContent=
-"Searching · "+
-Math.round(performance.now()-started)+
-" ms";
-
 /*
- * Everything starts together.
- * None of the secondary requests
- * block the local index.
+ * Everything starts independently.
+ * Nothing waits for another provider.
  */
 
-localSearch();
-
+searchLocal();
 wikipedia();
-
-youSearch();
-
+ddg();
+calculator();
+convert();
+weather();
 search360();
+imagesSearch();
+searchYou();
 
 }
 
