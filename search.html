@@ -4,61 +4,60 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TraceBreak</title>
-<meta name="description" content="Trace the web, not the user.">
-<link rel="icon" href="/TraceBreak/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/TraceBreak/favicon.svg">
 
 <style>
 *{box-sizing:border-box}
 
-html{
-scroll-behavior:smooth
+html,body{
+margin:0;
+padding:0
 }
 
 body{
-margin:0;
 background:#fff;
-color:#161616;
+color:#202124;
 font-family:Arial,Helvetica,sans-serif
 }
 
 header{
+border-bottom:1px solid #e5e5e5;
+background:#fff;
 position:sticky;
 top:0;
-z-index:50;
-background:rgba(255,255,255,.95);
-backdrop-filter:blur(14px);
-border-bottom:1px solid #e8e8e8
+z-index:10
 }
 
-.top{
-width:min(1160px,calc(100% - 32px));
-min-height:68px;
+.bar{
+width:min(1100px,calc(100% - 32px));
 margin:auto;
+min-height:64px;
 display:flex;
 align-items:center;
-gap:24px
+gap:22px
 }
 
 .logo{
-color:#111;
-font-size:21px;
 font-weight:700;
-letter-spacing:-1px;
-text-decoration:none
+font-size:20px;
+color:#111;
+text-decoration:none;
+white-space:nowrap
 }
 
 .search{
 display:flex;
-width:min(760px,100%)
+flex:1;
+max-width:720px
 }
 
 .search input{
-width:100%;
-height:42px;
-padding:0 14px;
-border:1px solid #ccc;
+height:40px;
+flex:1;
+padding:0 13px;
+border:1px solid #c8c8c8;
 border-right:0;
-border-radius:7px 0 0 7px;
+border-radius:6px 0 0 6px;
 outline:none;
 font-size:15px
 }
@@ -68,64 +67,62 @@ border-color:#777
 }
 
 .search button{
-height:42px;
-padding:0 19px;
+height:40px;
 border:0;
-border-radius:0 7px 7px 0;
-background:#171717;
+padding:0 18px;
+background:#202124;
 color:#fff;
+border-radius:0 6px 6px 0;
 cursor:pointer
 }
 
-.layout{
-width:min(1160px,calc(100% - 32px));
-margin:26px auto 90px;
-display:grid;
-grid-template-columns:minmax(0,760px) 320px;
-gap:55px
+.rub{
+height:36px;
+padding:0 12px;
+border:1px solid #ccc;
+background:#fff;
+color:#333;
+border-radius:5px;
+cursor:pointer;
+white-space:nowrap
 }
 
-.stats{
-margin-bottom:24px;
+main{
+width:min(1100px,calc(100% - 32px));
+margin:25px auto 80px;
+display:grid;
+grid-template-columns:minmax(0,740px) 300px;
+gap:48px
+}
+
+.status{
+font-size:13px;
 color:#777;
-font-size:13px
+margin-bottom:23px
 }
 
 .result{
-margin-bottom:28px;
-animation:appear .12s ease-out
+margin-bottom:27px
 }
 
-@keyframes appear{
-from{
-opacity:0;
-transform:translateY(4px)
-}
-to{
-opacity:1;
-transform:none
-}
-}
-
-.resultTop{
+.resultHead{
 display:flex;
-align-items:flex-start;
-gap:9px
+gap:8px;
+align-items:flex-start
 }
 
-.icon{
-width:19px;
-height:19px;
-margin-top:3px;
-border-radius:4px;
+.favicon{
+width:18px;
+height:18px;
 object-fit:contain;
-flex:0 0 19px
+margin-top:4px;
+flex:0 0 18px
 }
 
 .resultTitle{
-color:#174ea6;
-font-size:19px;
+font-size:18px;
 line-height:1.3;
+color:#1a0dab;
 text-decoration:none
 }
 
@@ -133,148 +130,244 @@ text-decoration:none
 text-decoration:underline
 }
 
-.url{
-margin:5px 0 4px 28px;
-overflow:hidden;
-color:#28743b;
+.resultUrl{
 font-size:13px;
+color:#188038;
+margin:4px 0 4px 26px;
 white-space:nowrap;
+overflow:hidden;
 text-overflow:ellipsis
 }
 
-.desc{
-margin:0 0 0 28px;
-color:#4b4b4b;
+.resultDesc{
 font-size:14px;
-line-height:1.55
+line-height:1.5;
+color:#4d5156;
+margin:0 0 0 26px
 }
 
-.panel{
+.knowledge{
 display:none;
-align-self:start;
-border-left:1px solid #e5e5e5;
-padding-left:24px
+border-left:1px solid #e4e4e4;
+padding-left:22px
 }
 
-.panel.show{
+.knowledge.active{
 display:block
 }
 
-.panelLabel{
-margin-bottom:13px;
-color:#777;
+.kLabel{
 font-size:11px;
 font-weight:700;
-letter-spacing:.1em;
-text-transform:uppercase
-}
-
-.panel h2{
-margin:0 0 5px;
-font-size:24px;
-line-height:1.2
-}
-
-.panelSource{
-margin-bottom:14px;
 color:#777;
-font-size:12px
+letter-spacing:.1em;
+text-transform:uppercase;
+margin-bottom:12px
 }
 
-.panelImage{
-display:block;
+.knowledge h2{
+font-size:23px;
+margin:0 0 5px
+}
+
+.kSource{
+font-size:12px;
+color:#777;
+margin-bottom:13px
+}
+
+.kImage{
 width:100%;
 max-height:190px;
-margin-bottom:14px;
-border-radius:7px;
-object-fit:cover
+object-fit:cover;
+border-radius:6px;
+margin-bottom:13px
 }
 
-.panelText{
-margin:0;
-color:#444;
+.kText{
 font-size:14px;
-line-height:1.55
+line-height:1.55;
+color:#444
 }
 
-.panelLink{
-display:inline-block;
-margin-top:12px;
-color:#174ea6;
+.kLink{
 font-size:13px;
+color:#1a0dab;
 text-decoration:none
 }
 
 .tool{
-margin-bottom:18px;
-padding:15px;
-border:1px solid #e4e4e4;
-border-radius:9px
+border:1px solid #e2e2e2;
+border-radius:7px;
+padding:14px;
+margin-bottom:17px
 }
 
-.toolTitle{
-margin-bottom:8px;
-font-size:13px;
-font-weight:700
+.toolName{
+font-size:12px;
+font-weight:700;
+margin-bottom:7px
 }
 
 .toolValue{
 font-size:22px
 }
 
-.toolSmall{
-margin-top:4px;
+.toolInfo{
+font-size:13px;
 color:#666;
-font-size:13px
+margin-top:4px
 }
 
 .imageGrid{
 display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:8px;
+grid-template-columns:repeat(4,1fr);
+gap:7px;
 margin-bottom:28px
 }
 
 .imageGrid img{
 width:100%;
-height:110px;
-border-radius:6px;
-object-fit:cover
+height:105px;
+object-fit:cover;
+border-radius:5px
+}
+
+/* RubMode */
+
+body.rubmode{
+background:#fff;
+color:#000;
+font-family:"Times New Roman",serif
+}
+
+body.rubmode header{
+position:static;
+border:0;
+background:#fff
+}
+
+body.rubmode .bar{
+width:95%;
+max-width:none;
+min-height:80px;
+gap:16px
+}
+
+body.rubmode .logo{
+font-family:Georgia,serif;
+font-size:22px
+}
+
+body.rubmode .search{
+max-width:620px
+}
+
+body.rubmode .search input{
+height:34px;
+border:1px solid #777;
+border-radius:0;
+font-family:inherit;
+font-size:16px
+}
+
+body.rubmode .search button{
+height:34px;
+border:1px solid #777;
+border-left:0;
+border-radius:0;
+background:#eee;
+color:#000;
+font-family:inherit
+}
+
+body.rubmode .rub{
+height:30px;
+border:1px solid #777;
+border-radius:0;
+background:#eee;
+color:#000;
+font-family:inherit
+}
+
+body.rubmode main{
+width:95%;
+max-width:none;
+display:grid;
+grid-template-columns:minmax(0,760px) 300px;
+gap:35px;
+margin:15px auto 60px
+}
+
+body.rubmode .status{
+color:#444;
+margin-bottom:18px
+}
+
+body.rubmode .result{
+margin-bottom:20px
+}
+
+body.rubmode .resultTitle{
+font-family:Arial,Helvetica,sans-serif;
+font-size:16px;
+color:#00e;
+text-decoration:underline
+}
+
+body.rubmode .resultUrl{
+font-family:Arial,Helvetica,sans-serif;
+color:#008000;
+margin-left:24px
+}
+
+body.rubmode .resultDesc{
+font-family:Arial,Helvetica,sans-serif;
+color:#333;
+margin-left:24px
+}
+
+body.rubmode .knowledge{
+border-left:1px solid #aaa;
+padding-left:15px
+}
+
+body.rubmode .tool{
+border:1px solid #999;
+border-radius:0;
+padding:9px;
+margin-bottom:12px
+}
+
+body.rubmode .imageGrid img{
+border-radius:0
 }
 
 @media(max-width:850px){
-.layout{
+main{
 grid-template-columns:1fr
 }
 
-.panel{
-border-top:1px solid #e5e5e5;
+.knowledge{
 border-left:0;
-padding:24px 0 0
+border-top:1px solid #ddd;
+padding:20px 0 0
 }
 }
 
-@media(max-width:600px){
-.top{
-gap:12px
+@media(max-width:650px){
+.bar{
+flex-wrap:wrap;
+padding:10px 0
 }
 
-.logo{
-font-size:18px
+.search{
+order:3;
+flex-basis:100%
 }
 
-.search button{
-display:none
-}
-
-.search input{
-border-right:1px solid #ccc;
-border-radius:7px
-}
-
-.url,
-.desc{
-margin-left:0
+.imageGrid{
+grid-template-columns:repeat(2,1fr)
 }
 }
 </style>
@@ -283,30 +376,25 @@ margin-left:0
 <body>
 
 <header>
-<div class="top">
+<div class="bar">
 
 <a class="logo" href="/TraceBreak/">TraceBreak</a>
 
 <form class="search" id="searchForm">
-<input
-id="queryInput"
-type="search"
-autocomplete="off"
-spellcheck="false"
->
-<button type="submit">Search</button>
+<input id="queryInput" type="search" autocomplete="off" spellcheck="true">
+<button>Search</button>
 </form>
+
+<button class="rub" id="rubToggle">RubMode</button>
 
 </div>
 </header>
 
-<main class="layout">
+<main>
 
 <section>
 
-<div class="stats" id="stats">
-Searching...
-</div>
+<div class="status" id="status">Searching...</div>
 
 <div id="tools"></div>
 <div id="images"></div>
@@ -314,132 +402,108 @@ Searching...
 
 </section>
 
-<aside class="panel" id="knowledge">
-
-<div class="panelLabel">
-Knowledge
-</div>
-
+<aside class="knowledge" id="knowledge">
+<div class="kLabel">Knowledge</div>
 <div id="knowledgeBody"></div>
-
 </aside>
 
 </main>
 
 <script>
 const BASE="/TraceBreak/";
+const SUPABASE="https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/";
 
-const SUPABASE=
-"https://tvxugmumfvgnvjacwwfz.supabase.co/functions/v1/";
+const params=new URLSearchParams(location.search);
+const query=(params.get("q")||"").trim();
 
-const params=
-new URLSearchParams(location.search);
+const input=document.getElementById("queryInput");
+const status=document.getElementById("status");
+const results=document.getElementById("results");
+const tools=document.getElementById("tools");
+const images=document.getElementById("images");
+const knowledge=document.getElementById("knowledge");
+const knowledgeBody=document.getElementById("knowledgeBody");
+const rubToggle=document.getElementById("rubToggle");
 
-const query=
-(params.get("q")||"").trim();
+const seen=new Set();
+const started=performance.now();
 
-const input=
-document.getElementById("queryInput");
-
-const stats=
-document.getElementById("stats");
-
-const results=
-document.getElementById("results");
-
-const tools=
-document.getElementById("tools");
-
-const images=
-document.getElementById("images");
-
-const panel=
-document.getElementById("knowledge");
-
-const panelBody=
-document.getElementById("knowledgeBody");
-
-const seen=
-new Set();
-
-const started=
-performance.now();
-
-input.value=
-query.replace(/\+/g," ");
+input.value=query.replace(/\+/g," ");
 
 function encodeQuery(value){
-return value
-.trim()
+
+const text=value.trim();
+
+if(text.includes("+")){
+return encodeURIComponent(text).replace(/%20/g,"+");
+}
+
+return text
 .split(/\s+/)
 .map(encodeURIComponent)
 .join("+");
 }
 
-document
-.getElementById("searchForm")
-.addEventListener("submit",e=>{
+document.getElementById("searchForm").addEventListener("submit",e=>{
 e.preventDefault();
 
-const value=
-input.value.trim();
+const value=input.value.trim();
 
 if(!value)return;
 
 location.href=
 BASE+
-"search?q="+
+"search.html?q="+
 encodeQuery(value);
 });
 
-function elapsed(){
-return Math.round(
-performance.now()-started
+rubToggle.addEventListener("click",()=>{
+
+document.body.classList.toggle("rubmode");
+
+const enabled=
+document.body.classList.contains("rubmode");
+
+rubToggle.textContent=
+enabled?
+"NormalMode":
+"RubMode";
+
+localStorage.setItem(
+"tracebreak-rubmode",
+enabled?
+"1":
+"0"
 );
+});
+
+if(localStorage.getItem("tracebreak-rubmode")==="1"){
+document.body.classList.add("rubmode");
+rubToggle.textContent="NormalMode";
 }
 
-function updateStats(){
+function time(){
+return Math.round(performance.now()-started);
+}
+
+function updateStatus(){
+
 const count=
 document.querySelectorAll(".result").length;
 
-stats.textContent=
-(count||0)+
+status.textContent=
+count+
 (count===1?" result":" results")+
 " · "+
-elapsed()+
+time()+
 " ms";
 }
 
-function cleanSnippet(value){
-
-if(!value)return "";
-
-let text=
-String(value)
-.replace(/\s+/g," ")
-.trim();
-
-text=
-text.replace(
-/^(summary|highlights|notes|overview|description)\s*:\s*/i,
-""
-);
-
-if(text.length>320){
-text=
-text.slice(0,317).trimEnd()+
-"...";
-}
-
-return text;
-}
-
-function canonical(url){
+function normalizeURL(url){
 
 try{
 
-const u=
-new URL(url);
+const u=new URL(url);
 
 u.hash="";
 
@@ -453,41 +517,46 @@ u.hash="";
 "fbclid",
 "msclkid",
 "dclid"
-].forEach(k=>{
-u.searchParams.delete(k);
-});
+].forEach(x=>u.searchParams.delete(x));
 
 return u.toString();
 
 }catch{
-return url;
+
+return String(url);
 }
 }
 
-function makeFavicon(url){
+function favicon(url){
 
 try{
 
-const u=
-new URL(url);
+const u=new URL(url);
 
-const img=
-document.createElement("img");
+const img=document.createElement("img");
 
-img.className="icon";
-img.alt="";
+img.className="favicon";
 img.loading="lazy";
-img.src=
-u.origin+
-"/favicon.ico";
+img.alt="";
+img.src=u.origin+"/favicon.ico";
 
 img.onerror=()=>{
+
+const fallback=
+"https://www.google.com/s2/favicons?sz=32&domain_url="+
+encodeURIComponent(url);
+
+if(img.src!==fallback){
+img.src=fallback;
+}else{
 img.remove();
+}
 };
 
 return img;
 
 }catch{
+
 return null;
 }
 }
@@ -503,57 +572,49 @@ item.href;
 
 if(!url)return false;
 
-const key=
-canonical(url);
+const key=normalizeURL(url);
 
 if(seen.has(key))return false;
 
 seen.add(key);
 
-const article=
-document.createElement("article");
+const result=document.createElement("article");
+result.className="result";
 
-article.className="result";
+const head=document.createElement("div");
+head.className="resultHead";
 
-const top=
-document.createElement("div");
+const icon=
+item.favicon?
+Object.assign(document.createElement("img"),{
+className:"favicon",
+src:item.favicon,
+alt:"",
+loading:"lazy"
+}):
+favicon(url);
 
-top.className="resultTop";
-
-let icon;
-
-if(item.favicon){
-
-icon=
-document.createElement("img");
-
-icon.className="icon";
-icon.alt="";
-icon.loading="lazy";
-icon.src=item.favicon;
+if(icon){
 
 icon.onerror=()=>{
-const fallback=
-makeFavicon(url);
 
-if(fallback){
-icon.replaceWith(fallback);
+if(!icon.dataset.fallback){
+
+icon.dataset.fallback="1";
+
+icon.src=
+"https://www.google.com/s2/favicons?sz=32&domain_url="+
+encodeURIComponent(url);
+
 }else{
 icon.remove();
 }
 };
-
-}else{
-icon=
-makeFavicon(url);
 }
 
-if(icon){
-top.appendChild(icon);
-}
+if(icon)head.appendChild(icon);
 
-const title=
-document.createElement("a");
+const title=document.createElement("a");
 
 title.className="resultTitle";
 title.href=url;
@@ -565,36 +626,43 @@ item.title||
 item.name||
 url;
 
-top.appendChild(title);
+head.appendChild(title);
 
-const urlNode=
-document.createElement("div");
+const urlNode=document.createElement("div");
 
-urlNode.className="url";
+urlNode.className="resultUrl";
 urlNode.textContent=url;
 
-const description=
-document.createElement("p");
+const desc=document.createElement("p");
 
-description.className="desc";
+desc.className="resultDesc";
 
-description.textContent=
-cleanSnippet(
+let text=
 item.description||
 item.snippet||
 item.snippet_text||
-""
-);
+"";
 
-article.append(
-top,
+text=String(text)
+.replace(/\s+/g," ")
+.replace(/^(summary|highlights|notes|overview)\s*:\s*/i,"")
+.trim();
+
+if(text.length>340){
+text=text.slice(0,337).trimEnd()+"...";
+}
+
+desc.textContent=text;
+
+result.append(
+head,
 urlNode,
-description
+desc
 );
 
-results.appendChild(article);
+results.appendChild(result);
 
-updateStats();
+updateStatus();
 
 return true;
 }
@@ -613,189 +681,148 @@ function showKnowledge(data,source){
 if(
 !data||
 (!data.title&&!data.description)
-){
-return;
-}
+)return;
 
-panelBody.replaceChildren();
+knowledgeBody.replaceChildren();
 
-const title=
-document.createElement("h2");
+const title=document.createElement("h2");
+title.textContent=data.title||query;
 
-title.textContent=
-data.title||
-query;
+const sourceNode=document.createElement("div");
+sourceNode.className="kSource";
+sourceNode.textContent=source;
 
-const sourceNode=
-document.createElement("div");
-
-sourceNode.className=
-"panelSource";
-
-sourceNode.textContent=
-source;
-
-panelBody.append(
+knowledgeBody.append(
 title,
 sourceNode
 );
 
 if(data.image){
 
-const image=
-document.createElement("img");
+const img=document.createElement("img");
 
-image.className=
-"panelImage";
+img.className="kImage";
+img.src=data.image;
+img.alt="";
+img.loading="eager";
 
-image.src=data.image;
-image.alt="";
-image.loading="eager";
+img.onerror=()=>img.remove();
 
-image.onerror=()=>{
-image.remove();
-};
-
-panelBody.appendChild(image);
+knowledgeBody.appendChild(img);
 }
 
 if(data.description){
 
-const text=
-document.createElement("p");
+const text=document.createElement("p");
 
-text.className=
-"panelText";
+text.className="kText";
+text.textContent=data.description;
 
-text.textContent=
-data.description;
-
-panelBody.appendChild(text);
+knowledgeBody.appendChild(text);
 }
 
 if(data.url){
 
-const link=
-document.createElement("a");
+const link=document.createElement("a");
 
-link.className=
-"panelLink";
-
+link.className="kLink";
 link.href=data.url;
 link.target="_blank";
 link.rel="noopener noreferrer";
+link.textContent="Read more";
 
-link.textContent=
-"Read more";
-
-panelBody.appendChild(link);
+knowledgeBody.appendChild(link);
 }
 
-panel.classList.add("show");
+knowledge.classList.add("active");
 }
 
 async function wikipedia(){
 
 try{
 
-const response=
-await fetch(
+const r=await fetch(
 "https://en.wikipedia.org/w/api.php"+
 "?action=query"+
 "&list=search"+
 "&srsearch="+
 encodeURIComponent(query)+
+"&srnamespace=0"+
 "&srlimit=1"+
 "&format=json"+
 "&origin=*",
-{
-cache:"no-store"
-}
+{cache:"no-store"}
 );
 
-if(!response.ok)return;
+if(!r.ok)return;
 
-const data=
-await response.json();
+const d=await r.json();
 
-const match=
-data.query?.search?.[0];
+const match=d.query?.search?.[0];
 
 if(!match)return;
 
-const page=
-await fetch(
+const page=await fetch(
 "https://en.wikipedia.org/api/rest_v1/page/summary/"+
 encodeURIComponent(match.title),
 {
-headers:{
-Accept:"application/json"
-},
+headers:{Accept:"application/json"},
 cache:"no-store"
 }
 );
 
 if(!page.ok)return;
 
-const result=
-await page.json();
+const data=await page.json();
 
 showKnowledge({
-title:result.title,
-description:result.extract,
+title:data.title,
+description:data.extract,
 image:
-result.thumbnail?.source||
-result.originalimage?.source,
-url:
-result.content_urls?.desktop?.page
+data.thumbnail?.source||
+data.originalimage?.source,
+url:data.content_urls?.desktop?.page
 },"Wikipedia");
 
 }catch(e){
-console.debug("Wikipedia",e);
+
+console.debug(e);
 }
 }
 
-async function duckDuckGo(){
+async function duckduckgo(){
 
 try{
 
-const response=
-await fetch(
+const r=await fetch(
 "https://api.duckduckgo.com/?q="+
 encodeURIComponent(query)+
 "&format=json"+
 "&no_html=1"+
 "&skip_disambig=1",
-{
-cache:"no-store"
-}
+{cache:"no-store"}
 );
 
-if(!response.ok)return;
+if(!r.ok)return;
 
-const data=
-await response.json();
+const d=await r.json();
 
 if(
-data.AbstractText&&
-!panel.classList.contains("show")
+d.AbstractText&&
+!knowledge.classList.contains("active")
 ){
 
 showKnowledge({
-title:
-data.Heading||
-query,
-description:
-data.AbstractText,
-image:
-data.Image,
-url:
-data.AbstractURL
+title:d.Heading||query,
+description:d.AbstractText,
+image:d.Image,
+url:d.AbstractURL
 },"DuckDuckGo");
 }
 
 }catch(e){
-console.debug("DDG",e);
+
+console.debug(e);
 }
 }
 
@@ -812,32 +839,20 @@ Function(
 "\"use strict\";return("+query+")"
 )();
 
-if(!Number.isFinite(value))
-return;
+if(!Number.isFinite(value))return;
 
-const box=
-document.createElement("div");
-
+const box=document.createElement("div");
 box.className="tool";
 
-const title=
-document.createElement("div");
+const name=document.createElement("div");
+name.className="toolName";
+name.textContent="Calculator";
 
-title.className="toolTitle";
-title.textContent="Calculator";
-
-const answer=
-document.createElement("div");
-
+const answer=document.createElement("div");
 answer.className="toolValue";
-answer.textContent=
-String(value);
+answer.textContent=String(value);
 
-box.append(
-title,
-answer
-);
-
+box.append(name,answer);
 tools.appendChild(box);
 
 }catch{}
@@ -845,224 +860,137 @@ tools.appendChild(box);
 
 function conversion(){
 
-const match=
-query.match(
+const match=query.match(
 /^(-?[\d.,]+)\s*(km|mi|m|ft|kg|lb|g|oz|c|f|°c|°f)$/i
 );
 
 if(!match)return;
 
-const number=
-Number(
+const n=Number(
 match[1].replace(/,/g,"")
 );
 
-const unit=
-match[2].toLowerCase();
+const u=match[2].toLowerCase();
 
-let output="";
+let out="";
 
-if(unit==="km")
-output=
-(number*.621371).toFixed(4)+" mi";
+if(u==="km")out=(n*.621371).toFixed(4)+" mi";
+else if(u==="mi")out=(n*1.609344).toFixed(4)+" km";
+else if(u==="m")out=(n*3.28084).toFixed(4)+" ft";
+else if(u==="ft")out=(n*.3048).toFixed(4)+" m";
+else if(u==="kg")out=(n*2.2046226218).toFixed(4)+" lb";
+else if(u==="lb")out=(n*.45359237).toFixed(4)+" kg";
+else if(u==="g")out=(n*.035273962).toFixed(4)+" oz";
+else if(u==="oz")out=(n*28.349523125).toFixed(4)+" g";
+else if(u==="c"||u==="°c")out=(n*9/5+32).toFixed(2)+" °F";
+else if(u==="f"||u==="°f")out=((n-32)*5/9).toFixed(2)+" °C";
 
-else if(unit==="mi")
-output=
-(number*1.609344).toFixed(4)+" km";
+if(!out)return;
 
-else if(unit==="m")
-output=
-(number*3.28084).toFixed(4)+" ft";
-
-else if(unit==="ft")
-output=
-(number*.3048).toFixed(4)+" m";
-
-else if(unit==="kg")
-output=
-(number*2.2046226218).toFixed(4)+" lb";
-
-else if(unit==="lb")
-output=
-(number*.45359237).toFixed(4)+" kg";
-
-else if(unit==="g")
-output=
-(number*.035273962).toFixed(4)+" oz";
-
-else if(unit==="oz")
-output=
-(number*28.349523125).toFixed(4)+" g";
-
-else if(unit==="c"||unit==="°c")
-output=
-(number*9/5+32).toFixed(2)+" °F";
-
-else if(unit==="f"||unit==="°f")
-output=
-((number-32)*5/9).toFixed(2)+" °C";
-
-if(!output)return;
-
-const box=
-document.createElement("div");
-
+const box=document.createElement("div");
 box.className="tool";
 
-const title=
-document.createElement("div");
+const name=document.createElement("div");
+name.className="toolName";
+name.textContent="Conversion";
 
-title.className="toolTitle";
-title.textContent="Conversion";
+const value=document.createElement("div");
+value.className="toolValue";
+value.textContent=out;
 
-const answer=
-document.createElement("div");
-
-answer.className="toolValue";
-answer.textContent=output;
-
-box.append(
-title,
-answer
-);
-
+box.append(name,value);
 tools.appendChild(box);
 }
 
 async function weather(){
 
-const match=
-query.match(
-/^\s*(?:weather|temperature|forecast)\s+(?:in|for|at)\s+(.+)$/i
+const m=query.match(
+/^(?:weather|temperature|forecast)\s+(?:in|for|at)\s+(.+)$/i
 );
 
-if(!match)return;
-
-const city=
-match[1].trim();
+if(!m)return;
 
 try{
 
-const geo=
-await fetch(
+const geo=await fetch(
 "https://geocoding-api.open-meteo.com/v1/search?name="+
-encodeURIComponent(city)+
+encodeURIComponent(m[1])+
 "&count=1&language=en&format=json",
-{
-cache:"no-store"
-}
+{cache:"no-store"}
 );
 
 if(!geo.ok)return;
 
-const location=
-await geo.json();
-
-const place=
-location.results?.[0];
+const g=await geo.json();
+const place=g.results?.[0];
 
 if(!place)return;
 
-const response=
-await fetch(
+const r=await fetch(
 "https://api.open-meteo.com/v1/forecast?latitude="+
 place.latitude+
 "&longitude="+
 place.longitude+
-"&current=temperature_2m,weather_code,wind_speed_10m",
-{
-cache:"no-store"
-}
+"&current=temperature_2m,wind_speed_10m",
+{cache:"no-store"}
 );
 
-if(!response.ok)return;
+if(!r.ok)return;
 
-const data=
-await response.json();
+const d=await r.json();
 
-const current=
-data.current;
-
-const box=
-document.createElement("div");
-
+const box=document.createElement("div");
 box.className="tool";
 
-const title=
-document.createElement("div");
+const name=document.createElement("div");
+name.className="toolName";
+name.textContent="Weather · "+place.name;
 
-title.className="toolTitle";
-
-title.textContent=
-"Weather · "+
-place.name;
-
-const value=
-document.createElement("div");
-
+const value=document.createElement("div");
 value.className="toolValue";
-
 value.textContent=
-Math.round(
-current.temperature_2m
-)+
-"°C";
+Math.round(d.current.temperature_2m)+"°C";
 
-const small=
-document.createElement("div");
-
-small.className="toolSmall";
-
-small.textContent=
+const info=document.createElement("div");
+info.className="toolInfo";
+info.textContent=
 "Wind "+
-Math.round(
-current.wind_speed_10m
-)+
+Math.round(d.current.wind_speed_10m)+
 " km/h";
 
-box.append(
-title,
-value,
-small
-);
-
+box.append(name,value,info);
 tools.appendChild(box);
 
 }catch(e){
-console.debug("Weather",e);
+
+console.debug(e);
 }
 }
 
-async function localSearch(){
+async function tracebreak(){
 
 try{
 
-const response=
-await fetch(
+const r=await fetch(
 SUPABASE+
 "tracebreak-search-fast?q="+
 encodeQuery(query)+
 "&limit=100",
 {
-headers:{
-Accept:"application/json"
-},
+headers:{Accept:"application/json"},
 cache:"no-store"
 }
 );
 
-if(!response.ok)return;
+if(!r.ok)return;
 
-const data=
-await response.json();
+const d=await r.json();
 
-addResults(
-data.results||
-[]
-);
+addResults(d.results||[]);
 
 }catch(e){
-console.debug("TraceBreak index",e);
+
+console.debug("TraceBreak",e);
 }
 }
 
@@ -1070,65 +998,63 @@ async function search360(){
 
 try{
 
-const response=
-await fetch(
+const r=await fetch(
 "https://api.360-search.com/?q="+
 encodeQuery(query)+
 "&type=web"+
 "&safe=moderate"+
 "&limit=30",
 {
-headers:{
-Accept:"application/json"
-},
+headers:{Accept:"application/json"},
 cache:"no-store"
 }
 );
 
-if(!response.ok)return;
+if(!r.ok)return;
 
-const data=
-await response.json();
+const d=await r.json();
 
-addResults(
-data.results||
-[]
-);
+addResults(d.results||[]);
 
 }catch(e){
+
 console.debug("360",e);
 }
 }
 
-async function youSearch(){
+async function you(){
 
 try{
 
-const response=
-await fetch(
+const r=await fetch(
 SUPABASE+
 "tracebreak-meta-fast?provider=you&q="+
 encodeQuery(query)+
 "&limit=30",
 {
-headers:{
-Accept:"application/json"
-},
+headers:{Accept:"application/json"},
 cache:"no-store"
 }
 );
 
-if(!response.ok)return;
+if(!r.ok)return;
 
-const data=
-await response.json();
+const d=await r.json();
+
+const provider=
+d.providers?.you;
+
+if(provider){
 
 addResults(
-data.providers?.you?.results||
+provider.results||
+provider.web||
 []
 );
+}
 
 }catch(e){
+
 console.debug("You",e);
 }
 }
@@ -1137,38 +1063,30 @@ async function imageSearch(){
 
 try{
 
-const response=
-await fetch(
+const r=await fetch(
 "https://api.360-search.com/?q="+
 encodeQuery(query)+
 "&type=image"+
 "&safe=moderate"+
 "&limit=12",
 {
-headers:{
-Accept:"application/json"
-},
+headers:{Accept:"application/json"},
 cache:"no-store"
 }
 );
 
-if(!response.ok)return;
+if(!r.ok)return;
 
-const data=
-await response.json();
+const d=await r.json();
 
 const list=
-Array.isArray(data.results)
-?
-data.results
-:
+Array.isArray(d.results)?
+d.results:
 [];
 
 if(!list.length)return;
 
-const grid=
-document.createElement("div");
-
+const grid=document.createElement("div");
 grid.className="imageGrid";
 
 for(const item of list){
@@ -1179,20 +1097,15 @@ item.thumbnail;
 
 if(!src)continue;
 
-const image=
-document.createElement("img");
+const img=document.createElement("img");
 
-image.src=src;
-image.alt=
-item.title||
-"";
-image.loading="lazy";
+img.src=src;
+img.alt=item.title||"";
+img.loading="lazy";
 
-image.onerror=()=>{
-image.remove();
-};
+img.onerror=()=>img.remove();
 
-grid.appendChild(image);
+grid.appendChild(img);
 }
 
 if(grid.children.length){
@@ -1200,6 +1113,7 @@ images.appendChild(grid);
 }
 
 }catch(e){
+
 console.debug("Images",e);
 }
 }
@@ -1208,20 +1122,16 @@ function run(){
 
 if(!query){
 
-stats.textContent=
+status.textContent=
 "Enter a search query.";
 
 return;
 }
 
-stats.textContent=
-"Searching · "+
-elapsed()+
-" ms";
+tracebreak();
 
-localSearch();
 wikipedia();
-duckDuckGo();
+duckduckgo();
 
 calculator();
 conversion();
@@ -1229,14 +1139,9 @@ weather();
 
 search360();
 imageSearch();
+you();
 
-/*
-You is intentionally last.
-It is completely independent and
-cannot delay the TraceBreak index.
-*/
-
-youSearch();
+updateStatus();
 }
 
 run();
