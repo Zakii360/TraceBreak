@@ -193,7 +193,8 @@
   <footer><div class="shell">TraceBreak · No cookies · No profiles · No analytics</div></footer>
 
   <script>
-    const apiBase = window.TRACEBREAK_API_BASE || (location.protocol === "file:" ? "http://localhost:8080/api" : `${location.origin}/api`);
+    const apiParameter = new URLSearchParams(location.search).get("api");
+    const apiBase = (window.TRACEBREAK_API_BASE || apiParameter || (location.protocol === "file:" ? "http://localhost:8080/api" : `${location.origin}/api`)).replace(/\/+$/, "");
     const form = document.getElementById("search-form");
     const input = document.getElementById("query");
     const submit = document.getElementById("submit");
@@ -263,6 +264,9 @@
           fetch(`${apiBase}/answer?q=${encodeURIComponent(query)}&sources=3`),
           fetch(`${apiBase}/search?q=${encodeURIComponent(query)}&limit=20`)
         ]);
+        if (answerResponse.status === 404 || searchResponse.status === 404) {
+          throw new Error("This static HTML is not connected to a TraceBreak API. Serve it from TraceBreak or add an API URL with ?api=https://your-api-host.example/api.");
+        }
         if (!answerResponse.ok || !searchResponse.ok) throw new Error("The index could not complete this reading.");
         const [answer, search] = await Promise.all([answerResponse.json(), searchResponse.json()]);
         renderBrief(answer);
